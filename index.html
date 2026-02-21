@@ -3,247 +3,1109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AthleteOS Enterprise 2.0</title>
+    <title>AthleteOS Enterprise 2.0 - Complete Sports Management</title>
+    
+    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 900: '#0c4a6e' }
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        .sidebar-item.active { background: rgba(14, 165, 233, 0.2); border-right: 3px solid #0ea5e9; }
-        .module-view { display: none; }
-        .module-view:not(.hidden) { display: block; animation: fadeIn 0.4s; }
+        * { scrollbar-width: thin; scrollbar-color: #cbd5e1 #f1f5f9; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        
+        .glass-panel { background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .sidebar-item { transition: all 0.2s; }
+        .sidebar-item:hover { background: rgba(255,255,255,0.1); }
+        .sidebar-item.active { background: rgba(14,165,233,0.2); border-right: 3px solid #0ea5e9; }
+        
+        .card-hover { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15); }
+        
         .mobile-nav { display: none; }
-        @media (max-width: 1024px) { .desktop-sidebar { display: none; } .mobile-nav { display: flex; } .main-content { margin-left: 0 !important; } }
+        @media (max-width: 1024px) { 
+            .desktop-sidebar { display: none; } 
+            .mobile-nav { display: flex; } 
+            .main-content { margin-left: 0 !important; } 
+        }
+        
+        .chat-bubble { max-width: 70%; padding: 12px 16px; border-radius: 16px; }
+        .chat-sent { background: #0ea5e9; color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+        .chat-received { background: #f1f5f9; color: #1e293b; border-bottom-left-radius: 4px; }
+        
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #e2e8f0; }
+        .calendar-day { background: white; min-height: 100px; padding: 8px; }
+        
+        .loading-spinner { 
+            border: 3px solid #f3f4f6; 
+            border-top: 3px solid #0ea5e9; 
+            border-radius: 50%; 
+            width: 24px; 
+            height: 24px; 
+            animation: spin 1s linear infinite; 
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .notification-toast { animation: slideInRight 0.4s ease-out; }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        
+        .drag-over { background: #e0f2fe; border: 2px dashed #0ea5e9; }
+        
+        .modal-enter { animation: modalFade 0.3s ease-out; }
+        @keyframes modalFade { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden">
 
-    <!-- Mobile Nav -->
-    <nav class="mobile-nav fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 px-4 py-2 justify-around">
-        <button onclick="switchModule('dashboard')" class="flex flex-col items-center p-2 text-blue-600"><i class="fas fa-home text-xl"></i><span class="text-xs">Home</span></button>
-        <button onclick="switchModule('registration')" class="flex flex-col items-center p-2 text-gray-400"><i class="fas fa-clipboard-list text-xl"></i><span class="text-xs">Register</span></button>
-        <button onclick="switchModule('rosters')" class="flex flex-col items-center p-2 text-gray-400"><i class="fas fa-users text-xl"></i><span class="text-xs">Rosters</span></button>
-        <button onclick="switchModule('commerce')" class="flex flex-col items-center p-2 text-gray-400"><i class="fas fa-shopping-bag text-xl"></i><span class="text-xs">Shop</span></button>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white z-50 flex items-center justify-center hidden">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-slate-600 font-medium">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 px-4 py-2 justify-around items-center shadow-lg">
+        <button onclick="switchModule('dashboard')" class="flex flex-col items-center p-2 text-brand-600" data-mobile="dashboard">
+            <i class="fas fa-home text-xl mb-1"></i>
+            <span class="text-xs font-medium">Home</span>
+        </button>
+        <button onclick="switchModule('registration')" class="flex flex-col items-center p-2 text-slate-400 hover:text-brand-600 transition" data-mobile="registration">
+            <i class="fas fa-clipboard-list text-xl mb-1"></i>
+            <span class="text-xs font-medium">Register</span>
+        </button>
+        <button onclick="switchModule('rosters')" class="flex flex-col items-center p-2 text-slate-400 hover:text-brand-600 transition" data-mobile="rosters">
+            <i class="fas fa-users text-xl mb-1"></i>
+            <span class="text-xs font-medium">Rosters</span>
+        </button>
+        <button onclick="switchModule('schedule')" class="flex flex-col items-center p-2 text-slate-400 hover:text-brand-600 transition" data-mobile="schedule">
+            <i class="fas fa-calendar text-xl mb-1"></i>
+            <span class="text-xs font-medium">Schedule</span>
+        </button>
+        <button onclick="switchModule('more')" class="flex flex-col items-center p-2 text-slate-400 hover:text-brand-600 transition" id="mobile-more-btn">
+            <i class="fas fa-ellipsis-h text-xl mb-1"></i>
+            <span class="text-xs font-medium">More</span>
+        </button>
     </nav>
 
-    <!-- Sidebar -->
-    <aside class="desktop-sidebar fixed left-0 top-0 h-full w-64 bg-slate-900 text-white z-40 overflow-y-auto">
-        <div class="p-6 border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white font-bold"><i class="fas fa-bolt"></i></div>
-                <div><h1 class="font-bold text-xl">AthleteOS</h1><p class="text-xs text-slate-400">Enterprise 2.0</p></div>
+    <!-- Mobile More Menu -->
+    <div id="mobile-more-menu" class="hidden fixed inset-0 z-50 bg-black/50" onclick="toggleMobileMore()">
+        <div class="absolute bottom-20 left-4 right-4 bg-white rounded-2xl shadow-2xl p-4 modal-enter" onclick="event.stopPropagation()">
+            <div class="grid grid-cols-3 gap-4">
+                <button onclick="switchModule('commerce'); toggleMobileMore()" class="flex flex-col items-center p-3 rounded-xl hover:bg-slate-50">
+                    <i class="fas fa-shopping-cart text-2xl text-brand-600 mb-2"></i>
+                    <span class="text-xs">Store</span>
+                </button>
+                <button onclick="switchModule('inventory'); toggleMobileMore()" class="flex flex-col items-center p-3 rounded-xl hover:bg-slate-50">
+                    <i class="fas fa-boxes text-2xl text-purple-600 mb-2"></i>
+                    <span class="text-xs">Inventory</span>
+                </button>
+                <button onclick="switchModule('messaging'); toggleMobileMore()" class="flex flex-col items-center p-3 rounded-xl hover:bg-slate-50">
+                    <i class="fas fa-comments text-2xl text-green-600 mb-2"></i>
+                    <span class="text-xs">Messages</span>
+                </button>
+                <button onclick="switchModule('facilities'); toggleMobileMore()" class="flex flex-col items-center p-3 rounded-xl hover:bg-slate-50">
+                    <i class="fas fa-map-marked-alt text-2xl text-amber-600 mb-2"></i>
+                    <span class="text-xs">Facilities</span>
+                </button>
+                <button onclick="switchModule('safety'); toggleMobileMore()" class="flex flex-col items-center p-3 rounded-xl hover:bg-slate-50">
+                    <i class="fas fa-shield-alt text-2xl text-red-600 mb-2"></i>
+                    <span class="text-xs">Safety</span>
+                </button>
+                <button onclick="switchModule('reports'); toggleMobileMore()" class="flex flex-col items-center p-3 rounded-xl hover:bg-slate-50">
+                    <i class="fas fa-chart-pie text-2xl text-indigo-600 mb-2"></i>
+                    <span class="text-xs">Analytics</span>
+                </button>
             </div>
         </div>
+    </div>
+
+    <!-- Desktop Sidebar -->
+    <aside class="desktop-sidebar fixed left-0 top-0 h-full w-64 bg-slate-900 text-white z-40 overflow-y-auto shadow-2xl">
+        <div class="p-6 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-brand-500 to-amber-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-xl tracking-tight">AthleteOS</h1>
+                    <p class="text-xs text-slate-400">Enterprise 2.0</p>
+                </div>
+            </div>
+        </div>
+
         <nav class="p-4 space-y-1">
-            <button onclick="switchModule('dashboard')" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left" data-module="dashboard"><i class="fas fa-chart-line w-5"></i><span>Dashboard</span></button>
-            <button onclick="switchModule('registration')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left" data-module="registration"><i class="fas fa-clipboard-check w-5"></i><span>Registration</span></button>
-            <button onclick="switchModule('rosters')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left" data-module="rosters"><i class="fas fa-users w-5"></i><span>Rosters</span></button>
-            <button onclick="switchModule('schedule')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left" data-module="schedule"><i class="fas fa-calendar-alt w-5"></i><span>Schedule</span></button>
-            <button onclick="switchModule('commerce')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left" data-module="commerce"><i class="fas fa-shopping-cart w-5"></i><span>Commerce</span></button>
-            <button onclick="switchModule('inventory')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left" data-module="inventory"><i class="fas fa-boxes w-5"></i><span>Inventory</span></button>
-            <button onclick="switchModule('messaging')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left" data-module="messaging"><i class="fas fa-comments w-5"></i><span>Messages</span></button>
-            <button onclick="switchModule('safety')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left" data-module="safety"><i class="fas fa-shield-alt w-5"></i><span>Safety</span></button>
-            <button onclick="switchModule('reports')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left" data-module="reports"><i class="fas fa-chart-pie w-5"></i><span>Analytics</span></button>
+            <button onclick="switchModule('dashboard')" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="dashboard">
+                <i class="fas fa-chart-line w-5 text-center"></i>
+                <span class="font-medium">Dashboard</span>
+            </button>
+            
+            <div class="pt-4 pb-2 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Operations</div>
+            
+            <button onclick="switchModule('registration')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="registration">
+                <i class="fas fa-clipboard-check w-5 text-center"></i>
+                <span>Registration</span>
+                <span class="ml-auto bg-brand-500 text-white text-xs px-2 py-0.5 rounded-full">New</span>
+            </button>
+            
+            <button onclick="switchModule('rosters')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="rosters">
+                <i class="fas fa-users w-5 text-center"></i>
+                <span>Rosters & Players</span>
+            </button>
+            
+            <button onclick="switchModule('schedule')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="schedule">
+                <i class="fas fa-calendar-alt w-5 text-center"></i>
+                <span>Scheduling</span>
+            </button>
+            
+            <button onclick="switchModule('facilities')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="facilities">
+                <i class="fas fa-map-marked-alt w-5 text-center"></i>
+                <span>Facilities</span>
+            </button>
+
+            <div class="pt-4 pb-2 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Commerce</div>
+            
+            <button onclick="switchModule('commerce')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="commerce">
+                <i class="fas fa-shopping-cart w-5 text-center"></i>
+                <span>Store & Payments</span>
+            </button>
+            
+            <button onclick="switchModule('inventory')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="inventory">
+                <i class="fas fa-boxes w-5 text-center"></i>
+                <span>Inventory</span>
+            </button>
+
+            <div class="pt-4 pb-2 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Communication</div>
+            
+            <button onclick="switchModule('messaging')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="messaging">
+                <i class="fas fa-comments w-5 text-center"></i>
+                <span>Messages</span>
+                <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full" id="msg-badge">3</span>
+            </button>
+            
+            <button onclick="switchModule('announcements')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="announcements">
+                <i class="fas fa-bullhorn w-5 text-center"></i>
+                <span>Announcements</span>
+            </button>
+
+            <div class="pt-4 pb-2 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Compliance</div>
+            
+            <button onclick="switchModule('safety')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="safety">
+                <i class="fas fa-shield-alt w-5 text-center"></i>
+                <span>Safety & Docs</span>
+            </button>
+            
+            <button onclick="switchModule('reports')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition" data-module="reports">
+                <i class="fas fa-chart-pie w-5 text-center"></i>
+                <span>Analytics</span>
+            </button>
         </nav>
+
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-800 bg-slate-900">
+            <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 transition cursor-pointer" onclick="showUserMenu()">
+                <img src="https://i.pravatar.cc/150?img=11" alt="Profile" class="w-10 h-10 rounded-full border-2 border-brand-500">
+                <div class="flex-1 min-w-0">
+                    <p class="font-medium text-sm text-white truncate">Alex Rivera</p>
+                    <p class="text-xs text-slate-400 truncate">Program Director</p>
+                </div>
+                <i class="fas fa-chevron-up text-slate-400"></i>
+            </div>
+        </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content lg:ml-64 min-h-screen pb-20 lg:pb-0">
+    <main class="main-content lg:ml-64 min-h-screen pb-24 lg:pb-0">
         
         <!-- Header -->
-        <header class="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-slate-200 px-4 sm:px-8 py-4 flex justify-between items-center">
-            <h2 id="page-title" class="text-2xl font-bold text-slate-900">Dashboard</h2>
+        <header class="sticky top-0 z-30 glass-panel border-b border-slate-200 px-4 sm:px-8 py-4 flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="lg:hidden p-2 text-slate-600 hover:text-slate-900">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <h2 id="page-title" class="text-2xl font-bold text-slate-900">Dashboard</h2>
+                <span id="season-badge" class="hidden sm:inline-block px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-sm font-semibold">Spring 2024</span>
+            </div>
+            
             <div class="flex items-center gap-3">
-                <button class="relative p-2 text-slate-600"><i class="fas fa-bell text-xl"></i><span class="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">5</span></button>
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-xl font-semibold"><i class="fas fa-plus"></i> New</button>
+                <!-- Search -->
+                <div class="hidden md:flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-4 py-2 shadow-sm focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent transition">
+                    <i class="fas fa-search text-slate-400"></i>
+                    <input type="text" id="global-search" placeholder="Search players, orders, events..." class="bg-transparent border-none focus:outline-none text-sm w-48 lg:w-64" onkeyup="handleSearch(event)">
+                </div>
+                
+                <!-- Notifications -->
+                <div class="relative">
+                    <button onclick="toggleNotifications()" class="relative p-2 text-slate-600 hover:text-brand-600 transition rounded-xl hover:bg-slate-100">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">5</span>
+                    </button>
+                    
+                    <!-- Notifications Dropdown -->
+                    <div id="notifications-panel" class="hidden absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 modal-enter">
+                        <div class="p-4 border-b border-slate-200 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-900">Notifications</h3>
+                            <button class="text-xs text-brand-600 hover:text-brand-800 font-semibold">Mark all read</button>
+                        </div>
+                        <div class="max-h-96 overflow-y-auto">
+                            <div class="p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer">
+                                <div class="flex gap-3">
+                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0">
+                                        <i class="fas fa-dollar-sign text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-slate-900 font-medium">Payment received</p>
+                                        <p class="text-xs text-slate-500">Emma Thompson paid $250</p>
+                                        <p class="text-xs text-slate-400 mt-1">2 min ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 border-b border-slate-100 hover:bg-slate-50 cursor-pointer">
+                                <div class="flex gap-3">
+                                    <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 flex-shrink-0">
+                                        <i class="fas fa-exclamation text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-slate-900 font-medium">Low stock alert</p>
+                                        <p class="text-xs text-slate-500">Size M jerseys: 3 left</p>
+                                        <p class="text-xs text-slate-400 mt-1">1 hour ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 border-t border-slate-200 text-center">
+                            <a href="#" class="text-sm text-brand-600 font-semibold hover:text-brand-800">View all notifications</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Action -->
+                <button onclick="toggleQuickActions()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl font-semibold shadow-lg shadow-brand-500/30 transition flex items-center gap-2">
+                    <i class="fas fa-plus"></i>
+                    <span class="hidden sm:inline">New</span>
+                </button>
             </div>
         </header>
 
-        <!-- DASHBOARD -->
-        <div id="module-dashboard" class="module-view p-4 sm:p-8">
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mb-3"><i class="fas fa-users"></i></div>
-                    <h3 class="text-2xl font-bold text-slate-900">1,247</h3>
+        <!-- MODULE: DASHBOARD -->
+        <div id="module-dashboard" class="module-view p-4 sm:p-8 space-y-6 animate-fade-in">
+            
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white rounded-2xl p-5 card-hover border border-slate-200 shadow-sm cursor-pointer" onclick="switchModule('rosters')">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <span class="text-green-600 text-xs font-bold flex items-center gap-1">
+                            <i class="fas fa-arrow-up"></i> 12%
+                        </span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900" id="kpi-players">1,247</h3>
                     <p class="text-slate-600 text-sm">Active Players</p>
+                    <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs">
+                        <span class="text-slate-500">Waitlist: 23</span>
+                        <span class="text-brand-600 font-semibold">View →</span>
+                    </div>
                 </div>
-                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600 mb-3"><i class="fas fa-dollar-sign"></i></div>
-                    <h3 class="text-2xl font-bold text-slate-900">$84.2k</h3>
-                    <p class="text-slate-600 text-sm">Revenue</p>
+
+                <div class="bg-white rounded-2xl p-5 card-hover border border-slate-200 shadow-sm cursor-pointer" onclick="switchModule('commerce')">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <span class="text-green-600 text-xs font-bold flex items-center gap-1">
+                            <i class="fas fa-arrow-up"></i> 8%
+                        </span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900" id="kpi-revenue">$84.2k</h3>
+                    <p class="text-slate-600 text-sm">Revenue YTD</p>
+                    <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs">
+                        <span class="text-slate-500">Outstanding: $12.4k</span>
+                        <span class="text-brand-600 font-semibold">Details →</span>
+                    </div>
                 </div>
-                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 mb-3"><i class="fas fa-shopping-bag"></i></div>
-                    <h3 class="text-2xl font-bold text-slate-900">847</h3>
-                    <p class="text-slate-600 text-sm">Orders</p>
+
+                <div class="bg-white rounded-2xl p-5 card-hover border border-slate-200 shadow-sm cursor-pointer" onclick="switchModule('inventory')">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <span class="text-amber-600 text-xs font-bold flex items-center gap-1">
+                            <i class="fas fa-exclamation-circle"></i> Low
+                        </span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900" id="kpi-orders">847</h3>
+                    <p class="text-slate-600 text-sm">Store Orders</p>
+                    <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs">
+                        <span class="text-slate-500">To fulfill: 12</span>
+                        <span class="text-brand-600 font-semibold">Manage →</span>
+                    </div>
                 </div>
-                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-                    <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 mb-3"><i class="fas fa-exclamation-triangle"></i></div>
-                    <h3 class="text-2xl font-bold text-slate-900">7</h3>
-                    <p class="text-slate-600 text-sm">Pending</p>
+
+                <div class="bg-white rounded-2xl p-5 card-hover border border-slate-200 shadow-sm cursor-pointer" onclick="switchModule('safety')">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <span class="text-red-600 text-xs font-bold">Action</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900" id="kpi-pending">7</h3>
+                    <p class="text-slate-600 text-sm">Pending Items</p>
+                    <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between text-xs">
+                        <span class="text-slate-500">Docs: 4 | Payments: 3</span>
+                        <span class="text-brand-600 font-semibold">Review →</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="font-bold text-slate-900 mb-4">Today's Schedule</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-4 p-4 bg-blue-50 rounded-xl border-l-4 border-blue-500">
-                        <div class="text-center min-w-[60px]"><div class="text-sm font-bold text-blue-700">4:00 PM</div></div>
-                        <div class="flex-1"><h4 class="font-bold text-slate-900">Varsity Practice</h4><p class="text-sm text-slate-600">Field A • 24 players</p></div>
-                        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">Check-in</button>
+
+            <!-- Main Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Left Column -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Schedule -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-slate-900">Today's Schedule</h3>
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1 text-xs border border-slate-300 rounded-lg hover:bg-slate-50 transition">Day</button>
+                                <button class="px-3 py-1 text-xs bg-slate-900 text-white rounded-lg">Week</button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3" id="today-schedule">
+                            <div class="flex items-center gap-4 p-4 bg-blue-50 rounded-xl border-l-4 border-blue-500 hover:bg-blue-100 transition cursor-pointer group">
+                                <div class="text-center min-w-[60px]">
+                                    <div class="text-sm font-bold text-blue-700">4:00 PM</div>
+                                    <div class="text-xs text-blue-500">2 hrs</div>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-slate-900 group-hover:text-blue-700 transition">Varsity Practice - Field A</h4>
+                                    <p class="text-sm text-slate-600">24 players confirmed • Coach: Mike Chen</p>
+                                </div>
+                                <button onclick="checkInPlayers('varsity-practice')" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition shadow-md">
+                                    Check-in
+                                </button>
+                            </div>
+                            
+                            <div class="flex items-center gap-4 p-4 bg-amber-50 rounded-xl border-l-4 border-amber-500 hover:bg-amber-100 transition cursor-pointer">
+                                <div class="text-center min-w-[60px]">
+                                    <div class="text-sm font-bold text-amber-700">6:30 PM</div>
+                                    <div class="text-xs text-amber-500">1.5 hrs</div>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-slate-900">Parent Meeting - Conference Room</h4>
+                                    <p class="text-sm text-slate-600">Spring tournament planning • 18 RSVPed</p>
+                                </div>
+                                <span class="px-3 py-1 bg-amber-200 text-amber-800 rounded-lg text-xs font-bold">Upcoming</span>
+                            </div>
+                        </div>
+                        
+                        <button onclick="switchModule('schedule')" class="w-full mt-4 py-3 text-brand-600 font-semibold hover:bg-brand-50 rounded-xl transition border border-dashed border-brand-300">
+                            View Full Schedule →
+                        </button>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-slate-900">Recent Activity</h3>
+                            <button class="text-sm text-brand-600 font-semibold hover:text-brand-800">View All</button>
+                        </div>
+                        <div class="space-y-4" id="activity-feed">
+                            <div class="flex items-start gap-3 pb-4 border-b border-slate-100 hover:bg-slate-50 p-2 rounded-lg transition cursor-pointer">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0">
+                                    <i class="fas fa-dollar-sign text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-slate-900"><span class="font-semibold">Emma Thompson</span> paid Spring Dues ($250)</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">2 minutes ago • Order #12847</p>
+                                </div>
+                                <button class="text-slate-400 hover:text-slate-600"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                            
+                            <div class="flex items-start gap-3 pb-4 border-b border-slate-100 hover:bg-slate-50 p-2 rounded-lg transition cursor-pointer">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0">
+                                    <i class="fas fa-user-plus text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-slate-900"><span class="font-semibold">New registration:</span> U12 Boys Soccer (Marcus Johnson)</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">15 minutes ago • Waitlist position #3</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-3 hover:bg-slate-50 p-2 rounded-lg transition cursor-pointer">
+                                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 flex-shrink-0">
+                                    <i class="fas fa-box text-xs"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-slate-900"><span class="font-semibold">Inventory alert:</span> Size M Jerseys low stock (3 remaining)</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">1 hour ago • Auto-reorder triggered</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-6">
+                    
+                    <!-- Weather -->
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-blue-100 text-sm mb-1">Practice Weather</p>
+                                <h3 class="text-4xl font-bold">72°F</h3>
+                                <p class="text-blue-100">Partly Cloudy</p>
+                            </div>
+                            <i class="fas fa-cloud-sun text-5xl text-blue-200"></i>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center text-sm text-blue-100 pt-4 border-t border-blue-400">
+                            <div><div class="font-bold">8mph</div><div class="text-xs opacity-75">Wind</div></div>
+                            <div><div class="font-bold">45%</div><div class="text-xs opacity-75">Humidity</div></div>
+                            <div><div class="font-bold">10%</div><div class="text-xs opacity-75">Rain</div></div>
+                        </div>
+                        <div class="mt-4 p-3 bg-white/10 rounded-lg backdrop-blur-sm flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i>
+                            <p class="text-sm">Great conditions for practice!</p>
+                        </div>
+                    </div>
+
+                    <!-- Program Health -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <h3 class="font-bold text-slate-900 mb-4">Program Health</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-slate-600">Registration Goal</span>
+                                    <span class="font-bold text-slate-900">84%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-brand-500 h-2 rounded-full transition-all duration-1000" style="width: 84%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-slate-600">Payment Collection</span>
+                                    <span class="font-bold text-slate-900">92%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-green-500 h-2 rounded-full transition-all duration-1000" style="width: 92%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-slate-600">Form Completion</span>
+                                    <span class="font-bold text-amber-600">67%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-amber-500 h-2 rounded-full transition-all duration-1000" style="width: 67%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <h3 class="font-bold text-slate-900 mb-4">Quick Actions</h3>
+                        <div class="space-y-2">
+                            <button onclick="sendPaymentReminders()" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition text-left group">
+                                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-200 transition">
+                                    <i class="fas fa-file-invoice-dollar text-sm"></i>
+                                </div>
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900">Send Payment Reminders</span>
+                                <i class="fas fa-chevron-right ml-auto text-slate-400 opacity-0 group-hover:opacity-100 transition"></i>
+                            </button>
+                            <button onclick="emailAllParents()" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition text-left group">
+                                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center text-green-600 group-hover:bg-green-200 transition">
+                                    <i class="fas fa-envelope text-sm"></i>
+                                </div>
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900">Email All Parents</span>
+                                <i class="fas fa-chevron-right ml-auto text-slate-400 opacity-0 group-hover:opacity-100 transition"></i>
+                            </button>
+                            <button onclick="printRosters()" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition text-left group">
+                                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-200 transition">
+                                    <i class="fas fa-print text-sm"></i>
+                                </div>
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900">Print Rosters</span>
+                                <i class="fas fa-chevron-right ml-auto text-slate-400 opacity-0 group-hover:opacity-100 transition"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Birthdays -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <h3 class="font-bold text-slate-900 mb-4">Team Birthdays</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition cursor-pointer">
+                                <img src="https://i.pravatar.cc/150?img=32" class="w-10 h-10 rounded-full">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-sm text-slate-900">Jamal Wilson</p>
+                                    <p class="text-xs text-slate-500">Turning 13 • Tomorrow</p>
+                                </div>
+                                <i class="fas fa-birthday-cake text-pink-500"></i>
+                            </div>
+                            <div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition cursor-pointer">
+                                <img src="https://i.pravatar.cc/150?img=45" class="w-10 h-10 rounded-full">
+                                <div class="flex-1">
+                                    <p class="font-semibold text-sm text-slate-900">Sarah Chen</p>
+                                    <p class="text-xs text-slate-500">Turning 12 • In 3 days</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- REGISTRATION -->
-        <div id="module-registration" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Registration</h2>
+        <!-- MODULE: REGISTRATION -->
+        <div id="module-registration" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+                <div>
+                    <h2 class="text-3xl font-display font-bold text-slate-900">Registration Management</h2>
+                    <p class="text-slate-600 mt-1">Programs, waitlists, and family management</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="openRegistrationWizard()" class="bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-brand-500/30 transition flex items-center gap-2">
+                        <i class="fas fa-plus"></i> New Program
+                    </button>
+                    <button class="bg-white border border-slate-300 text-slate-700 px-4 py-3 rounded-xl font-semibold hover:bg-slate-50 transition">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="text-2xl font-bold text-slate-900">3</div>
+                    <div class="text-sm text-slate-600">Active Programs</div>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="text-2xl font-bold text-brand-600">23</div>
+                    <div class="text-sm text-slate-600">Waitlisted</div>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="text-2xl font-bold text-green-600">94%</div>
+                    <div class="text-sm text-slate-600">Completion Rate</div>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="text-2xl font-bold text-amber-600">12</div>
+                    <div class="text-sm text-slate-600">Pending Forms</div>
+                </div>
+            </div>
+
+            <!-- Programs List -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-200">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <h3 class="text-lg font-bold text-slate-900">Active Programs</h3>
+                        <div class="flex gap-3">
+                            <select class="px-4 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                                <option>All Seasons</option>
+                                <option>Spring 2024</option>
+                                <option>Fall 2023</option>
+                            </select>
+                            <div class="relative">
+                                <input type="text" placeholder="Search programs..." class="pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm w-64 focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                                <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="divide-y divide-slate-200" id="programs-list">
+                    <!-- Program 1 -->
+                    <div class="p-6 hover:bg-slate-50 transition group">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-2xl flex-shrink-0 group-hover:scale-110 transition">
+                                    <i class="fas fa-futbol"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h4 class="text-xl font-bold text-slate-900">Spring Soccer League 2024</h4>
+                                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">Open</span>
+                                    </div>
+                                    <p class="text-slate-600 text-sm mb-2">Ages 8-14 • Co-ed • 12 weeks</p>
+                                    <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                                        <span><i class="fas fa-calendar mr-1"></i> Mar 1 - May 15</span>
+                                        <span><i class="fas fa-map-marker-alt mr-1"></i> Central Fields</span>
+                                        <span><i class="fas fa-dollar-sign mr-1"></i> $250/player</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-6">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-slate-900">84/100</div>
+                                    <div class="text-xs text-slate-500">Registered</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-amber-600">16</div>
+                                    <div class="text-xs text-slate-500">Spots Left</div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="viewProgramDetails('soccer-spring')" class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 transition">Manage</button>
+                                    <button class="px-3 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition"><i class="fas fa-ellipsis-v"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-600">Capacity</span>
+                                <span class="font-semibold text-slate-900">84%</span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                                <div class="bg-brand-500 h-2 rounded-full relative" style="width: 84%">
+                                    <div class="absolute right-0 top-0 bottom-0 w-2 bg-white/50 animate-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program 2 -->
+                    <div class="p-6 hover:bg-slate-50 transition bg-amber-50/30 group">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 text-2xl flex-shrink-0 group-hover:scale-110 transition">
+                                    <i class="fas fa-basketball-ball"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h4 class="text-xl font-bold text-slate-900">Elite Basketball Camp</h4>
+                                        <span class="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-bold">Waitlist</span>
+                                    </div>
+                                    <p class="text-slate-600 text-sm mb-2">Ages 12-16 • Advanced • 1 week intensive</p>
+                                    <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                                        <span><i class="fas fa-calendar mr-1"></i> Apr 15-19</span>
+                                        <span><i class="fas fa-map-marker-alt mr-1"></i> Sports Complex</span>
+                                        <span><i class="fas fa-dollar-sign mr-1"></i> $450/player</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-6">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-slate-900">40/40</div>
+                                    <div class="text-xs text-slate-500">Full Capacity</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-amber-600">12</div>
+                                    <div class="text-xs text-slate-500">Waitlisted</div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-semibold hover:bg-amber-700 transition">Waitlist</button>
+                                    <button class="px-3 py-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition"><i class="fas fa-ellipsis-v"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Waitlist Priority Queue -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-slate-900">Spring Soccer League 2024</h3>
-                    <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">Open</span>
+                    <h3 class="text-lg font-bold text-slate-900">Waitlist Priority Queue</h3>
+                    <button class="text-brand-600 hover:text-brand-700 text-sm font-semibold">View All Waitlists</button>
                 </div>
-                <div class="flex justify-between items-center">
-                    <div><p class="text-slate-600">84/100 registered</p></div>
-                    <div class="text-right"><div class="text-2xl font-bold text-slate-900">16</div><div class="text-xs text-slate-500">Spots Left</div></div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-xs font-semibold text-slate-500 uppercase">
+                            <tr>
+                                <th class="px-4 py-3">Priority</th>
+                                <th class="px-4 py-3">Player</th>
+                                <th class="px-4 py-3">Program</th>
+                                <th class="px-4 py-3">Date Added</th>
+                                <th class="px-4 py-3">Status</th>
+                                <th class="px-4 py-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-sm">
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="px-4 py-3"><span class="font-bold text-brand-600 text-lg">#1</span></td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <img src="https://i.pravatar.cc/150?img=12" class="w-8 h-8 rounded-full">
+                                        <div>
+                                            <div class="font-semibold text-slate-900">Marcus Johnson</div>
+                                            <div class="text-xs text-slate-500">Age 13 • Returning player</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-slate-700">Elite Basketball Camp</td>
+                                <td class="px-4 py-3 text-slate-500">Feb 15, 2024</td>
+                                <td class="px-4 py-3"><span class="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">Waitlisted</span></td>
+                                <td class="px-4 py-3">
+                                    <button onclick="offerSpot('marcus-johnson')" class="text-brand-600 hover:text-brand-800 font-semibold text-sm">Offer Spot</button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="px-4 py-3"><span class="font-bold text-slate-600 text-lg">#2</span></td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <img src="https://i.pravatar.cc/150?img=33" class="w-8 h-8 rounded-full">
+                                        <div>
+                                            <div class="font-semibold text-slate-900">Emma Rodriguez</div>
+                                            <div class="text-xs text-slate-500">Age 12 • Sibling of current player</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-slate-700">Elite Basketball Camp</td>
+                                <td class="px-4 py-3 text-slate-500">Feb 16, 2024</td>
+                                <td class="px-4 py-3"><span class="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">Waitlisted</span></td>
+                                <td class="px-4 py-3">
+                                    <button class="text-slate-400 cursor-not-allowed text-sm">Pending</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="w-full bg-slate-200 rounded-full h-2 mt-3"><div class="bg-blue-500 h-2 rounded-full" style="width: 84%"></div></div>
             </div>
         </div>
 
-        <!-- ROSTERS -->
+        <!-- Additional modules would continue here... -->
+        
+        <!-- Placeholder for other modules -->
         <div id="module-rosters" class="module-view hidden p-4 sm:p-8">
             <h2 class="text-3xl font-bold text-slate-900 mb-6">Team Rosters</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="h-32 bg-gradient-to-br from-blue-400 to-blue-600 relative">
-                        <div class="absolute top-3 right-3 w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold">10</div>
-                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
-                            <h3 class="text-white font-bold text-lg">Alex Martinez</h3>
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <div class="grid grid-cols-3 gap-2 text-center">
-                            <div class="bg-slate-50 rounded-lg p-2"><div class="text-lg font-bold">12</div><div class="text-xs text-slate-500">Games</div></div>
-                            <div class="bg-slate-50 rounded-lg p-2"><div class="text-lg font-bold">8</div><div class="text-xs text-slate-500">Goals</div></div>
-                            <div class="bg-slate-50 rounded-lg p-2"><div class="text-lg font-bold">94%</div><div class="text-xs text-slate-500">Attend</div></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <p class="text-slate-600">Roster management module - Add player cards here</p>
         </div>
-
-        <!-- SCHEDULE -->
+        
         <div id="module-schedule" class="module-view hidden p-4 sm:p-8">
             <h2 class="text-3xl font-bold text-slate-900 mb-6">Schedule</h2>
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <div class="grid grid-cols-7 gap-px bg-slate-200">
-                    <div class="bg-slate-50 p-2 text-center text-sm font-semibold">Sun</div>
-                    <div class="bg-slate-50 p-2 text-center text-sm font-semibold">Mon</div>
-                    <div class="bg-slate-50 p-2 text-center text-sm font-semibold">Tue</div>
-                    <div class="bg-slate-50 p-2 text-center text-sm font-semibold">Wed</div>
-                    <div class="bg-slate-50 p-2 text-center text-sm font-semibold">Thu</div>
-                    <div class="bg-slate-50 p-2 text-center text-sm font-semibold">Fri</div>
-                    <div class="bg-slate-50 p-2 text-center text-sm font-semibold">Sat</div>
-                    <div class="bg-white p-2 min-h-[80px]">1</div>
-                    <div class="bg-white p-2 min-h-[80px]">2</div>
-                    <div class="bg-white p-2 min-h-[80px]">3</div>
-                    <div class="bg-white p-2 min-h-[80px]">4</div>
-                    <div class="bg-white p-2 min-h-[80px]">5</div>
-                    <div class="bg-white p-2 min-h-[80px]">6</div>
-                    <div class="bg-white p-2 min-h-[80px]">7</div>
-                </div>
-            </div>
+            <p class="text-slate-600">Calendar and scheduling module</p>
         </div>
-
-        <!-- COMMERCE -->
+        
+        <div id="module-facilities" class="module-view hidden p-4 sm:p-8">
+            <h2 class="text-3xl font-bold text-slate-900 mb-6">Facilities</h2>
+            <p class="text-slate-600">Facility booking and management</p>
+        </div>
+        
         <div id="module-commerce" class="module-view hidden p-4 sm:p-8">
             <h2 class="text-3xl font-bold text-slate-900 mb-6">Commerce Hub</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-2xl font-bold">$12.4k</div><div class="text-sm text-slate-600">This Month</div></div>
-                <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-2xl font-bold">156</div><div class="text-sm text-slate-600">Orders</div></div>
-                <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-2xl font-bold text-amber-600">24</div><div class="text-sm text-slate-600">Abandoned</div></div>
-                <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-2xl font-bold text-green-600">$3.2k</div><div class="text-sm text-slate-600">Recovered</div></div>
-            </div>
+            <p class="text-slate-600">Store and payment management</p>
         </div>
-
-        <!-- INVENTORY -->
+        
         <div id="module-inventory" class="module-view hidden p-4 sm:p-8">
             <h2 class="text-3xl font-bold text-slate-900 mb-6">Inventory</h2>
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <table class="w-full text-sm">
-                    <thead class="bg-slate-50"><tr><th class="px-6 py-4 text-left font-semibold">Product</th><th class="px-6 py-4 text-left font-semibold">Stock</th><th class="px-6 py-4 text-left font-semibold">Status</th></tr></thead>
-                    <tbody class="divide-y divide-slate-200">
-                        <tr class="hover:bg-slate-50"><td class="px-6 py-4 font-semibold">Pro Jersey</td><td class="px-6 py-4">45 units</td><td class="px-6 py-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">In Stock</span></td></tr>
-                        <tr class="hover:bg-slate-50 bg-amber-50/30"><td class="px-6 py-4 font-semibold">Training Shorts</td><td class="px-6 py-4">8 units</td><td class="px-6 py-4"><span class="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold">Low</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <p class="text-slate-600">Stock and inventory tracking</p>
         </div>
-
-        <!-- MESSAGING -->
+        
         <div id="module-messaging" class="module-view hidden p-4 sm:p-8">
             <h2 class="text-3xl font-bold text-slate-900 mb-6">Messages</h2>
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 h-96 flex">
-                <div class="w-1/3 border-r border-slate-200 p-4">
-                    <div class="p-3 bg-blue-50 rounded-lg cursor-pointer"><div class="font-semibold text-sm">U14 Parents</div><div class="text-xs text-slate-500">Can we reschedule?</div></div>
-                </div>
-                <div class="w-2/3 flex flex-col">
-                    <div class="flex-1 p-4 overflow-y-auto">
-                        <div class="bg-slate-100 rounded-lg p-3 mb-2 max-w-[80%]"><p class="text-sm">Hi Coach, when is the next game?</p></div>
-                        <div class="bg-blue-500 text-white rounded-lg p-3 mb-2 max-w-[80%] ml-auto"><p class="text-sm">Saturday at 10am!</p></div>
-                    </div>
-                    <div class="p-4 border-t border-slate-200"><input type="text" placeholder="Type a message..." class="w-full px-4 py-2 border border-slate-300 rounded-full"></div>
-                </div>
-            </div>
+            <p class="text-slate-600">Team communication module</p>
         </div>
-
-        <!-- SAFETY -->
+        
+        <div id="module-announcements" class="module-view hidden p-4 sm:p-8">
+            <h2 class="text-3xl font-bold text-slate-900 mb-6">Announcements</h2>
+            <p class="text-slate-600">Broadcast and news module</p>
+        </div>
+        
         <div id="module-safety" class="module-view hidden p-4 sm:p-8">
             <h2 class="text-3xl font-bold text-slate-900 mb-6">Safety & Compliance</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-2xl font-bold text-green-600">94%</div><div class="text-sm text-slate-600">Medical Forms</div></div>
-                <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-2xl font-bold">12</div><div class="text-sm text-slate-600">Coach Certs</div></div>
-                <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-2xl font-bold text-amber-600">4</div><div class="text-sm text-slate-600">Expiring Soon</div></div>
-                <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-2xl font-bold text-red-600">2</div><div class="text-sm text-slate-600">Overdue</div></div>
-            </div>
+            <p class="text-slate-600">Document tracking and safety</p>
         </div>
-
-        <!-- REPORTS -->
+        
         <div id="module-reports" class="module-view hidden p-4 sm:p-8">
             <h2 class="text-3xl font-bold text-slate-900 mb-6">Analytics</h2>
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <h3 class="font-bold text-slate-900 mb-4">Revenue Overview</h3>
-                <div class="h-64 flex items-end justify-around">
-                    <div class="w-12 bg-blue-500 rounded-t" style="height: 40%"></div>
-                    <div class="w-12 bg-blue-500 rounded-t" style="height: 65%"></div>
-                    <div class="w-12 bg-blue-500 rounded-t" style="height: 50%"></div>
-                    <div class="w-12 bg-blue-500 rounded-t" style="height: 85%"></div>
-                    <div class="w-12 bg-blue-500 rounded-t" style="height: 75%"></div>
-                    <div class="w-12 bg-blue-500 rounded-t" style="height: 100%"></div>
-                </div>
-                <div class="flex justify-around mt-2 text-xs text-slate-500">
-                    <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-                </div>
-            </div>
+            <p class="text-slate-600">Reports and analytics module</p>
         </div>
 
     </main>
 
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed bottom-24 lg:bottom-4 right-4 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- Quick Actions Modal -->
+    <div id="quick-actions-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-start justify-center pt-20 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 modal-enter">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-slate-900">Quick Actions</h3>
+                <button onclick="toggleQuickActions()" class="text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="addPlayer(); toggleQuickActions()" class="p-4 border-2 border-slate-200 rounded-xl hover:border-brand-500 hover:bg-brand-50 transition text-center group">
+                    <i class="fas fa-user-plus text-2xl text-brand-600 mb-2 group-hover:scale-110 transition"></i>
+                    <p class="text-sm font-semibold text-slate-700">Add Player</p>
+                </button>
+                <button onclick="createEvent(); toggleQuickActions()" class="p-4 border-2 border-slate-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition text-center group">
+                    <i class="fas fa-calendar-plus text-2xl text-green-600 mb-2 group-hover:scale-110 transition"></i>
+                    <p class="text-sm font-semibold text-slate-700">New Event</p>
+                </button>
+                <button onclick="recordPayment(); toggleQuickActions()" class="p-4 border-2 border-slate-200 rounded-xl hover:border-amber-500 hover:bg-amber-50 transition text-center group">
+                    <i class="fas fa-dollar-sign text-2xl text-amber-600 mb-2 group-hover:scale-110 transition"></i>
+                    <p class="text-sm font-semibold text-slate-700">Record Payment</p>
+                </button>
+                <button onclick="sendAnnouncement(); toggleQuickActions()" class="p-4 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition text-center group">
+                    <i class="fas fa-bullhorn text-2xl text-purple-600 mb-2 group-hover:scale-110 transition"></i>
+                    <p class="text-sm font-semibold text-slate-700">Announcement</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
     <script>
+        // State Management
+        const AppState = {
+            currentModule: 'dashboard',
+            notifications: 5,
+            messages: 3,
+            user: {
+                name: 'Alex Rivera',
+                role: 'Program Director',
+                avatar: 'https://i.pravatar.cc/150?img=11'
+            }
+        };
+
+        // Module Switching
         function switchModule(moduleName) {
-            document.querySelectorAll('.module-view').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('module-' + moduleName).classList.remove('hidden');
-            document.querySelector('[data-module="' + moduleName + '"]').classList.add('active');
+            // Hide all modules
+            document.querySelectorAll('.module-view').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('animate-fade-in');
+            });
             
+            // Remove active from sidebar
+            document.querySelectorAll('.sidebar-item').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected module
+            const selectedModule = document.getElementById('module-' + moduleName);
+            if (selectedModule) {
+                selectedModule.classList.remove('hidden');
+                selectedModule.classList.add('animate-fade-in');
+            }
+            
+            // Update sidebar active state
+            const sidebarItem = document.querySelector('[data-module="' + moduleName + '"]');
+            if (sidebarItem) {
+                sidebarItem.classList.add('active');
+            }
+            
+            // Update mobile nav
+            document.querySelectorAll('[data-mobile]').forEach(el => {
+                el.classList.remove('text-brand-600');
+                el.classList.add('text-slate-400');
+            });
+            const mobileNav = document.querySelector('[data-mobile="' + moduleName + '"]');
+            if (mobileNav) {
+                mobileNav.classList.remove('text-slate-400');
+                mobileNav.classList.add('text-brand-600');
+            }
+            
+            // Update title
             const titles = {
-                'dashboard': 'Dashboard', 'registration': 'Registration', 'rosters': 'Rosters',
-                'schedule': 'Schedule', 'commerce': 'Commerce', 'inventory': 'Inventory',
-                'messaging': 'Messages', 'safety': 'Safety', 'reports': 'Analytics'
+                'dashboard': 'Dashboard',
+                'registration': 'Registration Management',
+                'rosters': 'Team Rosters',
+                'schedule': 'Schedule & Events',
+                'facilities': 'Facility Management',
+                'commerce': 'Commerce Hub',
+                'inventory': 'Inventory Management',
+                'messaging': 'Team Messages',
+                'announcements': 'Announcements',
+                'safety': 'Safety & Compliance',
+                'reports': 'Analytics & Reporting'
             };
-            document.getElementById('page-title').textContent = titles[moduleName];
+            
+            const titleElement = document.getElementById('page-title');
+            if (titleElement) {
+                titleElement.textContent = titles[moduleName] || 'Dashboard';
+            }
+            
+            AppState.currentModule = moduleName;
+            window.scrollTo(0, 0);
         }
+
+        // Mobile Menu Toggle
+        function toggleMobileMore() {
+            const menu = document.getElementById('mobile-more-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Notifications Toggle
+        function toggleNotifications() {
+            const panel = document.getElementById('notifications-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        // Quick Actions Toggle
+        function toggleQuickActions() {
+            const modal = document.getElementById('quick-actions-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        // Sidebar Toggle (Mobile)
+        function toggleSidebar() {
+            // For mobile sidebar implementation
+            showToast('Sidebar toggle - mobile view');
+        }
+
+        // User Menu
+        function showUserMenu() {
+            showToast('User menu: Profile, Settings, Logout');
+        }
+
+        // Toast Notifications
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                info: 'bg-slate-900',
+                success: 'bg-green-600',
+                warning: 'bg-amber-600',
+                error: 'bg-red-600'
+            };
+            
+            toast.className = `notification-toast ${colors[type]} text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 pointer-events-auto min-w-[300px]`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'error' ? 'times-circle' : 'info-circle'}"></i>
+                <span class="font-medium">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Action Functions
+        function addPlayer() {
+            showToast('Opening player registration form...', 'info');
+        }
+
+        function createEvent() {
+            showToast('Opening event creation wizard...', 'info');
+        }
+
+        function recordPayment() {
+            showToast('Opening payment recorder...', 'info');
+        }
+
+        function sendAnnouncement() {
+            showToast('Opening announcement composer...', 'info');
+        }
+
+        function checkInPlayers(eventId) {
+            showToast(`Checking in players for: ${eventId}`, 'success');
+        }
+
+        function viewProgramDetails(programId) {
+            showToast(`Loading program: ${programId}`, 'info');
+        }
+
+        function offerSpot(playerId) {
+            showToast(`Offering spot to: ${playerId}`, 'success');
+        }
+
+        function openRegistrationWizard() {
+            showToast('Launching registration wizard...', 'info');
+        }
+
+        function sendPaymentReminders() {
+            showToast('Sending payment reminders to 12 families...', 'success');
+        }
+
+        function emailAllParents() {
+            showToast('Opening email composer for all parents...', 'info');
+        }
+
+        function printRosters() {
+            showToast('Preparing rosters for print...', 'info');
+        }
+
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                const query = event.target.value;
+                showToast(`Searching for: ${query}`, 'info');
+            }
+        }
+
+        // Close modals on outside click
+        document.addEventListener('click', function(e) {
+            // Close notifications when clicking outside
+            const notificationsPanel = document.getElementById('notifications-panel');
+            const bellButton = e.target.closest('button');
+            if (!notificationsPanel.contains(e.target) && (!bellButton || !bellButton.querySelector('.fa-bell'))) {
+                notificationsPanel.classList.add('hidden');
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check mobile
+            if (window.innerWidth < 1024) {
+                document.body.classList.add('mobile');
+            }
+            
+            // Set initial module
+            switchModule('dashboard');
+            
+            // Simulate loading data
+            setTimeout(() => {
+                showToast('Welcome to AthleteOS Enterprise 2.0!', 'success');
+            }, 1000);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth < 1024) {
+                document.body.classList.add('mobile');
+            } else {
+                document.body.classList.remove('mobile');
+                document.getElementById('mobile-more-menu').classList.add('hidden');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // ESC to close modals
+            if (e.key === 'Escape') {
+                document.getElementById('quick-actions-modal').classList.add('hidden');
+                document.getElementById('notifications-panel').classList.add('hidden');
+                document.getElementById('mobile-more-menu').classList.add('hidden');
+            }
+            
+            // / to focus search
+            if (e.key === '/' && !e.target.matches('input')) {
+                e.preventDefault();
+                document.getElementById('global-search')?.focus();
+            }
+        });
     </script>
 </body>
 </html>
