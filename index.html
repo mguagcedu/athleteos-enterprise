@@ -441,6 +441,67 @@
                     <i class="fas fa-plus"></i>
                     <span class="hidden sm:inline">New</span>
                 </button>
+
+                <!-- Avatar / User Menu trigger -->
+                <div class="relative">
+                    <button onclick="toggleUserMenu(event)" id="user-avatar-btn" class="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-slate-100 transition">
+                        <img src="https://i.pravatar.cc/150?img=11" class="w-8 h-8 rounded-full border-2 border-brand-400">
+                        <div class="hidden sm:block text-left">
+                            <p class="text-sm font-semibold text-slate-900 leading-none">Alex Rivera</p>
+                            <p class="text-xs text-slate-500 mt-0.5">Program Director</p>
+                        </div>
+                        <i class="fas fa-chevron-down text-slate-400 text-xs hidden sm:block"></i>
+                    </button>
+
+                    <!-- Dropdown -->
+                    <div id="user-menu-dropdown" class="hidden absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 modal-enter overflow-hidden">
+                        <!-- Profile header -->
+                        <div class="p-4 bg-gradient-to-br from-brand-50 to-slate-50 border-b border-slate-200">
+                            <div class="flex items-center gap-3">
+                                <img src="https://i.pravatar.cc/150?img=11" class="w-12 h-12 rounded-full border-2 border-white shadow-md">
+                                <div>
+                                    <p class="font-bold text-slate-900">Alex Rivera</p>
+                                    <p class="text-xs text-slate-500">alex@centralyouthsports.org</p>
+                                    <span class="mt-1 inline-block px-2 py-0.5 bg-brand-100 text-brand-700 rounded text-xs font-bold">Program Director</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Org switcher -->
+                        <div class="px-3 py-2 border-b border-slate-100">
+                            <p class="text-xs font-semibold text-slate-500 uppercase px-2 mb-1">Organization</p>
+                            <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-slate-50 cursor-pointer hover:bg-slate-100 transition">
+                                <div class="w-6 h-6 bg-gradient-to-br from-brand-500 to-amber-500 rounded-md flex items-center justify-center text-white text-xs font-bold">A</div>
+                                <span class="text-sm font-semibold text-slate-900 flex-1">Central Youth Sports</span>
+                                <i class="fas fa-check text-brand-500 text-xs"></i>
+                            </div>
+                            <button onclick="showToast('Opening org switcher...','info'); closeUserMenu()" class="w-full text-left px-2 py-1.5 mt-1 rounded-lg text-xs text-brand-600 hover:bg-brand-50 font-semibold transition"><i class="fas fa-plus mr-1"></i>Add organization</button>
+                        </div>
+                        <!-- Menu items -->
+                        <div class="p-2">
+                            <button onclick="showToast('Opening your profile...','info'); closeUserMenu()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition text-left">
+                                <i class="fas fa-user w-4 text-center text-slate-400"></i> My Profile
+                            </button>
+                            <button onclick="showToast('Opening account settings...','info'); closeUserMenu()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition text-left">
+                                <i class="fas fa-cog w-4 text-center text-slate-400"></i> Settings
+                            </button>
+                            <button onclick="showToast('Opening notification preferences...','info'); closeUserMenu()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition text-left">
+                                <i class="fas fa-bell w-4 text-center text-slate-400"></i> Notifications
+                            </button>
+                            <button onclick="showToast('Opening billing & plan...','info'); closeUserMenu()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition text-left">
+                                <i class="fas fa-credit-card w-4 text-center text-slate-400"></i> Billing &amp; Plan
+                                <span class="ml-auto px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-bold">Pro</span>
+                            </button>
+                            <button onclick="showToast('Opening help center...','info'); closeUserMenu()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-700 hover:bg-slate-100 transition text-left">
+                                <i class="fas fa-question-circle w-4 text-center text-slate-400"></i> Help &amp; Support
+                            </button>
+                        </div>
+                        <div class="p-2 border-t border-slate-100">
+                            <button onclick="showToast('Signing out...','info'); closeUserMenu()" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-red-600 hover:bg-red-50 transition text-left font-semibold">
+                                <i class="fas fa-sign-out-alt w-4 text-center"></i> Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -1486,11 +1547,26 @@
                 </div>
             </div>
 
-            <!-- Month View placeholder -->
-            <div id="cal-month-view" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center text-slate-500">
-                <i class="fas fa-calendar-alt text-4xl text-slate-300 mb-3"></i>
-                <p class="font-semibold">Month view coming soon</p>
-                <p class="text-sm mt-1">Switch to Week or List view for now</p>
+            <!-- Month View -->
+            <div id="cal-month-view" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <!-- Month nav -->
+                <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200">
+                    <button onclick="shiftMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition text-slate-600"><i class="fas fa-chevron-left text-sm"></i></button>
+                    <h3 id="month-label" class="font-bold text-slate-900">February 2024</h3>
+                    <button onclick="shiftMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition text-slate-600"><i class="fas fa-chevron-right text-sm"></i></button>
+                </div>
+                <!-- Day-of-week headers -->
+                <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
+                    <div class="py-2 text-center text-xs font-bold text-slate-500 uppercase">Sun</div>
+                    <div class="py-2 text-center text-xs font-bold text-slate-500 uppercase">Mon</div>
+                    <div class="py-2 text-center text-xs font-bold text-slate-500 uppercase">Tue</div>
+                    <div class="py-2 text-center text-xs font-bold text-slate-500 uppercase">Wed</div>
+                    <div class="py-2 text-center text-xs font-bold text-slate-500 uppercase">Thu</div>
+                    <div class="py-2 text-center text-xs font-bold text-slate-500 uppercase">Fri</div>
+                    <div class="py-2 text-center text-xs font-bold text-slate-500 uppercase">Sat</div>
+                </div>
+                <!-- Calendar grid — rendered by JS -->
+                <div id="month-grid" class="grid grid-cols-7"></div>
             </div>
         </div>
         
@@ -3064,6 +3140,290 @@
         </div>
     </div>
 
+    <!-- Player Profile Slide-over -->
+    <div id="player-profile-backdrop" onclick="closePlayerProfile()" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-300"></div>
+    <div id="player-profile-panel" class="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto flex flex-col">
+        <!-- Close -->
+        <div class="sticky top-0 bg-white z-10 px-5 py-4 border-b border-slate-200 flex justify-between items-center">
+            <span class="text-sm font-semibold text-slate-500">Player Profile</span>
+            <button onclick="closePlayerProfile()" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- Profile hero -->
+        <div id="player-hero" class="p-6 bg-gradient-to-br from-brand-50 to-slate-100 border-b border-slate-200">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <img id="player-avatar" src="" class="w-20 h-20 rounded-2xl border-4 border-white shadow-lg object-cover">
+                    <span id="player-status-dot" class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h2 id="player-name" class="text-2xl font-bold text-slate-900"></h2>
+                    <p id="player-meta" class="text-sm text-slate-500 mt-0.5"></p>
+                    <span id="player-team-badge" class="mt-2 inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold"></span>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mt-5">
+                <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+                    <div class="text-lg font-bold text-slate-900" id="player-stat-gp">24</div>
+                    <div class="text-xs text-slate-500">Games Played</div>
+                </div>
+                <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+                    <div class="text-lg font-bold text-green-600" id="player-stat-att">92%</div>
+                    <div class="text-xs text-slate-500">Attendance</div>
+                </div>
+                <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+                    <div class="text-lg font-bold text-brand-600" id="player-stat-season">Spring '24</div>
+                    <div class="text-xs text-slate-500">Season</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-slate-200 bg-white sticky top-[57px] z-10">
+            <button onclick="setPlayerTab('overview')" id="ptab-overview" class="player-tab flex-1 py-3 text-sm font-semibold text-brand-600 border-b-2 border-brand-500 transition">Overview</button>
+            <button onclick="setPlayerTab('history')" id="ptab-history" class="player-tab flex-1 py-3 text-sm font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition">History</button>
+            <button onclick="setPlayerTab('docs')" id="ptab-docs" class="player-tab flex-1 py-3 text-sm font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition">Documents</button>
+            <button onclick="setPlayerTab('notes')" id="ptab-notes" class="player-tab flex-1 py-3 text-sm font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition">Notes</button>
+        </div>
+
+        <!-- Tab content -->
+        <div class="flex-1 p-5 space-y-5">
+
+            <!-- Overview tab -->
+            <div id="pview-overview" class="space-y-4">
+                <div class="bg-slate-50 rounded-xl p-4 space-y-3">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Player Details</h4>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div><span class="text-slate-500">Date of Birth</span><p class="font-semibold text-slate-900 mt-0.5" id="pdet-dob">Mar 12, 2011</p></div>
+                        <div><span class="text-slate-500">Jersey #</span><p class="font-semibold text-slate-900 mt-0.5" id="pdet-jersey">#7</p></div>
+                        <div><span class="text-slate-500">Position</span><p class="font-semibold text-slate-900 mt-0.5" id="pdet-pos">Midfielder</p></div>
+                        <div><span class="text-slate-500">Member Since</span><p class="font-semibold text-slate-900 mt-0.5">Sep 2022</p></div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 rounded-xl p-4 space-y-3">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Parent / Guardian</h4>
+                    <div class="flex items-center gap-3">
+                        <img src="https://i.pravatar.cc/150?img=9" class="w-9 h-9 rounded-full">
+                        <div class="flex-1">
+                            <p class="font-semibold text-slate-900 text-sm" id="pdet-parent">David Johnson</p>
+                            <p class="text-xs text-slate-500">d.johnson@email.com · (555) 012-3456</p>
+                        </div>
+                        <button onclick="showToast('Opening message to parent...','info')" class="w-8 h-8 flex items-center justify-center rounded-lg bg-brand-50 text-brand-600 hover:bg-brand-100 transition text-sm"><i class="fas fa-comment"></i></button>
+                    </div>
+                </div>
+                <div class="bg-slate-50 rounded-xl p-4 space-y-3">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Registration Status</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-600 flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i> Player Registration Form</span>
+                            <span class="text-green-600 font-semibold">Complete</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-600 flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i> Medical / Health Form</span>
+                            <span class="text-green-600 font-semibold">Complete</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-600 flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i> Photo Release</span>
+                            <span class="text-green-600 font-semibold">Complete</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-600 flex items-center gap-2" id="pdet-payment-icon"><i class="fas fa-check-circle text-green-500"></i> Spring 2024 Dues</span>
+                            <span class="text-green-600 font-semibold" id="pdet-payment-status">Paid</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History tab -->
+            <div id="pview-history" class="hidden space-y-3">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Season History</h4>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between bg-slate-50 rounded-xl p-3 text-sm">
+                        <div><p class="font-semibold text-slate-900">Spring 2024</p><p class="text-xs text-slate-500">Varsity Soccer</p></div>
+                        <div class="text-right"><p class="font-semibold text-slate-700">24 GP · 92% att.</p><span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-bold">Active</span></div>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-50 rounded-xl p-3 text-sm">
+                        <div><p class="font-semibold text-slate-900">Fall 2023</p><p class="text-xs text-slate-500">JV Soccer</p></div>
+                        <div class="text-right"><p class="font-semibold text-slate-700">18 GP · 88% att.</p><span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs font-bold">Complete</span></div>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-50 rounded-xl p-3 text-sm">
+                        <div><p class="font-semibold text-slate-900">Spring 2023</p><p class="text-xs text-slate-500">U12 Soccer</p></div>
+                        <div class="text-right"><p class="font-semibold text-slate-700">20 GP · 95% att.</p><span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs font-bold">Complete</span></div>
+                    </div>
+                </div>
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider pt-2">Payment History</h4>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between bg-slate-50 rounded-xl p-3 text-sm"><span class="text-slate-700">Spring 2024 Dues</span><span class="font-semibold text-green-600">$250 · Paid</span></div>
+                    <div class="flex items-center justify-between bg-slate-50 rounded-xl p-3 text-sm"><span class="text-slate-700">Jersey #7</span><span class="font-semibold text-green-600">$62 · Paid</span></div>
+                    <div class="flex items-center justify-between bg-slate-50 rounded-xl p-3 text-sm"><span class="text-slate-700">Fall 2023 Dues</span><span class="font-semibold text-green-600">$250 · Paid</span></div>
+                </div>
+            </div>
+
+            <!-- Documents tab -->
+            <div id="pview-docs" class="hidden space-y-3">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Filed Documents</h4>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-3 bg-slate-50 rounded-xl p-3 hover:bg-slate-100 transition cursor-pointer" onclick="showToast('Opening registration form...','info')">
+                        <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0"><i class="fas fa-file-pdf text-sm"></i></div>
+                        <div class="flex-1 min-w-0"><p class="font-semibold text-slate-900 text-sm">Player Registration Form</p><p class="text-xs text-slate-500">Signed Feb 1, 2024</p></div>
+                        <i class="fas fa-download text-slate-400 text-sm"></i>
+                    </div>
+                    <div class="flex items-center gap-3 bg-slate-50 rounded-xl p-3 hover:bg-slate-100 transition cursor-pointer" onclick="showToast('Opening medical form...','info')">
+                        <div class="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center text-green-600 flex-shrink-0"><i class="fas fa-file-medical text-sm"></i></div>
+                        <div class="flex-1 min-w-0"><p class="font-semibold text-slate-900 text-sm">Medical / Health Form</p><p class="text-xs text-slate-500">Signed Jan 28, 2024</p></div>
+                        <i class="fas fa-download text-slate-400 text-sm"></i>
+                    </div>
+                    <div class="flex items-center gap-3 bg-slate-50 rounded-xl p-3 hover:bg-slate-100 transition cursor-pointer" onclick="showToast('Opening photo release...','info')">
+                        <div class="w-9 h-9 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 flex-shrink-0"><i class="fas fa-camera text-sm"></i></div>
+                        <div class="flex-1 min-w-0"><p class="font-semibold text-slate-900 text-sm">Photo Release</p><p class="text-xs text-slate-500">Signed Jan 28, 2024</p></div>
+                        <i class="fas fa-download text-slate-400 text-sm"></i>
+                    </div>
+                </div>
+                <button onclick="showToast('Opening file upload...','info')" class="w-full py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-sm text-slate-500 hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50 transition font-semibold">
+                    <i class="fas fa-upload mr-2"></i>Upload Document
+                </button>
+            </div>
+
+            <!-- Notes tab -->
+            <div id="pview-notes" class="hidden space-y-3">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Coach Notes</h4>
+                <div class="space-y-3">
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                        <div class="flex justify-between items-start mb-1"><span class="text-xs font-bold text-amber-700">Coach Chen</span><span class="text-xs text-slate-400">Feb 18, 2024</span></div>
+                        <p class="text-sm text-slate-700">Strong performance in last scrimmage. Work on left-foot passing accuracy. Ready for starting position consideration.</p>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        <div class="flex justify-between items-start mb-1"><span class="text-xs font-bold text-slate-600">Coach Rivera</span><span class="text-xs text-slate-400">Jan 30, 2024</span></div>
+                        <p class="text-sm text-slate-700">Good attitude and coachability. Encourage more vocal leadership on field.</p>
+                    </div>
+                </div>
+                <textarea id="new-note-text" rows="3" placeholder="Add a note..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"></textarea>
+                <button onclick="const v=document.getElementById('new-note-text').value.trim();if(v){showToast('Note saved.','success');document.getElementById('new-note-text').value='';}" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold transition">Save Note</button>
+            </div>
+
+        </div>
+
+        <!-- Action footer -->
+        <div class="sticky bottom-0 bg-white border-t border-slate-200 p-4 flex gap-2">
+            <button onclick="showToast('Opening message to player family...','info')" class="flex-1 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                <i class="fas fa-comment text-slate-400"></i> Message
+            </button>
+            <button onclick="showToast('Opening edit player form...','info')" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2">
+                <i class="fas fa-edit"></i> Edit Player
+            </button>
+        </div>
+    </div>
+
+    <!-- Create Event Modal -->
+    <div id="create-event-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg modal-enter max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-slate-200 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-xl font-bold text-slate-900">Create Event</h3>
+                <button onclick="closeCreateEventModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-5">
+                <!-- Event type tabs -->
+                <div>
+                    <label class="text-sm font-semibold text-slate-700 block mb-2">Event Type</label>
+                    <div class="flex gap-2 flex-wrap" id="event-type-tabs">
+                        <button onclick="selectEventType(this,'practice')" class="event-type-tab px-3 py-1.5 rounded-lg text-sm font-semibold bg-blue-500 text-white transition">Practice</button>
+                        <button onclick="selectEventType(this,'game')" class="event-type-tab px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Game</button>
+                        <button onclick="selectEventType(this,'meeting')" class="event-type-tab px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Meeting</button>
+                        <button onclick="selectEventType(this,'camp')" class="event-type-tab px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Camp / Clinic</button>
+                        <button onclick="selectEventType(this,'other')" class="event-type-tab px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">Other</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-slate-700 block mb-1">Event Title <span class="text-red-500">*</span></label>
+                    <input type="text" id="evt-title" placeholder="e.g. Varsity Practice" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Date <span class="text-red-500">*</span></label>
+                        <input type="date" id="evt-date" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Repeats</label>
+                        <select class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                            <option>Does not repeat</option>
+                            <option>Every week</option>
+                            <option>Every 2 weeks</option>
+                            <option>Every weekday (Mon–Fri)</option>
+                            <option>Custom...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Start Time</label>
+                        <input type="time" id="evt-start" value="16:00" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">End Time</label>
+                        <input type="time" id="evt-end" value="18:00" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Facility / Location</label>
+                        <select class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                            <option>Field A — Central Park</option>
+                            <option>Field B — Central Park</option>
+                            <option>Main Gymnasium</option>
+                            <option>Aquatic Center</option>
+                            <option>Conference Room A</option>
+                            <option>North Park Field</option>
+                            <option>Away / TBD</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Team(s)</label>
+                        <select class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                            <option>All Teams</option>
+                            <option>Varsity Soccer</option>
+                            <option>JV Soccer</option>
+                            <option>U12 Basketball</option>
+                            <option>U10 Soccer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Game-specific: Opponent (show/hide via JS) -->
+                <div id="evt-opponent-row" class="hidden">
+                    <label class="text-sm font-semibold text-slate-700 block mb-1">Opponent</label>
+                    <input type="text" placeholder="e.g. Riverside FC" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-slate-700 block mb-1">Notes / Description</label>
+                    <textarea rows="2" placeholder="Any additional details for coaches or parents..." class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"></textarea>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" class="rounded text-brand-600" checked>
+                        <span class="text-sm text-slate-700">Notify players &amp; parents via app + email</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" class="rounded text-brand-600">
+                        <span class="text-sm text-slate-700">Require RSVP / attendance confirmation</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="px-6 pb-6 flex gap-3 sticky bottom-0 bg-white pt-4 border-t border-slate-100">
+                <button onclick="closeCreateEventModal()" class="flex-1 py-2.5 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition text-sm">Cancel</button>
+                <button onclick="submitCreateEvent()" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-lg shadow-brand-500/30 transition text-sm flex items-center justify-center gap-2">
+                    <i class="fas fa-calendar-plus"></i> Create Event
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Add Inventory Item Modal -->
     <div id="add-item-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md modal-enter">
@@ -3322,9 +3682,23 @@
         }
 
         // User Menu
-        function showUserMenu() {
-            showToast('User menu: Profile, Settings, Logout');
+        function toggleUserMenu(e) {
+            e.stopPropagation();
+            const dd = document.getElementById('user-menu-dropdown');
+            dd.classList.toggle('hidden');
         }
+        function closeUserMenu() {
+            document.getElementById('user-menu-dropdown').classList.add('hidden');
+        }
+        function showUserMenu() { toggleUserMenu({ stopPropagation: ()=>{} }); }
+        // Close user menu on outside click
+        document.addEventListener('click', function(e) {
+            const btn = document.getElementById('user-avatar-btn');
+            const dd  = document.getElementById('user-menu-dropdown');
+            if (dd && btn && !btn.contains(e.target) && !dd.contains(e.target)) {
+                dd.classList.add('hidden');
+            }
+        });
 
         // Toast Notifications
         function showToast(message, type = 'info') {
@@ -3556,6 +3930,8 @@
                 document.getElementById('add-item-modal').classList.add('hidden');
                 document.getElementById('add-player-modal').classList.add('hidden');
                 document.getElementById('record-payment-modal').classList.add('hidden');
+                document.getElementById('create-event-modal').classList.add('hidden');
+                closePlayerProfile();
                 closeRegistrationWizard();
             }
 
@@ -3756,6 +4132,158 @@
                     ? 'px-3 py-1.5 rounded-md text-sm font-semibold bg-white shadow-sm text-slate-900 transition'
                     : 'px-3 py-1.5 rounded-md text-sm font-semibold text-slate-500 transition';
             });
+        }
+
+        // Player Profile Slide-over
+        const PLAYER_DATA = {
+            default: { name:'Marcus Johnson', meta:'Age 13 · Jersey #7', team:'Varsity Soccer', avatar:'https://i.pravatar.cc/150?img=12', dob:'Mar 12, 2011', jersey:'#7', pos:'Midfielder', parent:'David Johnson', payment:'Paid', paymentClass:'text-green-600' },
+            1: { name:'Jamal Wilson', meta:'Age 13 · Jersey #11', team:'Varsity Soccer', avatar:'https://i.pravatar.cc/150?img=32', dob:'Jul 4, 2010', jersey:'#11', pos:'Forward', parent:'Sarah Wilson', payment:'Paid', paymentClass:'text-green-600' },
+            2: { name:'Sarah Chen', meta:'Age 12 · Jersey #3', team:'JV Soccer', avatar:'https://i.pravatar.cc/150?img=45', dob:'Nov 2, 2011', jersey:'#3', pos:'Goalkeeper', parent:'Wei Chen', payment:'Pending', paymentClass:'text-amber-600' },
+            3: { name:'Tyler Brooks', meta:'Age 12 · Jersey #24', team:'U12 Basketball', avatar:'https://i.pravatar.cc/150?img=20', dob:'May 18, 2011', jersey:'#24', pos:'Point Guard', parent:'James Brooks', payment:'Paid', paymentClass:'text-green-600' },
+            4: { name:'Emma Rodriguez', meta:'Age 10 · Jersey #5', team:'U10 Soccer', avatar:'https://i.pravatar.cc/150?img=33', dob:'Sep 9, 2013', jersey:'#5', pos:'Winger', parent:'Carlos Rodriguez', payment:'Paid', paymentClass:'text-green-600' },
+        };
+        let _playerIdx = 0;
+        function openPlayerProfile(card) {
+            _playerIdx++;
+            const d = PLAYER_DATA[_playerIdx] || PLAYER_DATA.default;
+            document.getElementById('player-avatar').src      = d.avatar;
+            document.getElementById('player-name').textContent = d.name;
+            document.getElementById('player-meta').textContent = d.meta;
+            document.getElementById('player-team-badge').textContent = d.team;
+            document.getElementById('pdet-dob').textContent    = d.dob;
+            document.getElementById('pdet-jersey').textContent = d.jersey;
+            document.getElementById('pdet-pos').textContent    = d.pos;
+            document.getElementById('pdet-parent').textContent = d.parent;
+            document.getElementById('pdet-payment-status').textContent  = d.payment;
+            document.getElementById('pdet-payment-status').className    = 'font-semibold ' + d.paymentClass;
+            const icon = document.getElementById('pdet-payment-icon');
+            icon.innerHTML = d.payment === 'Paid'
+                ? '<i class="fas fa-check-circle text-green-500"></i> Spring 2024 Dues'
+                : '<i class="fas fa-exclamation-circle text-amber-500"></i> Spring 2024 Dues';
+            setPlayerTab('overview');
+            document.getElementById('player-profile-panel').classList.remove('translate-x-full');
+            document.getElementById('player-profile-backdrop').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closePlayerProfile() {
+            document.getElementById('player-profile-panel').classList.add('translate-x-full');
+            document.getElementById('player-profile-backdrop').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        function setPlayerTab(tab) {
+            ['overview','history','docs','notes'].forEach(t => {
+                document.getElementById('pview-' + t).classList.toggle('hidden', t !== tab);
+                const btn = document.getElementById('ptab-' + t);
+                btn.className = t === tab
+                    ? 'player-tab flex-1 py-3 text-sm font-semibold text-brand-600 border-b-2 border-brand-500 transition'
+                    : 'player-tab flex-1 py-3 text-sm font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 transition';
+            });
+        }
+
+        // Create Event Modal
+        function openCreateEventModal() {
+            document.getElementById('create-event-modal').classList.remove('hidden');
+            // default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('evt-date').value = today;
+        }
+        function closeCreateEventModal() {
+            document.getElementById('create-event-modal').classList.add('hidden');
+        }
+        function createEvent() { openCreateEventModal(); }
+        function selectEventType(btn, type) {
+            document.querySelectorAll('.event-type-tab').forEach(b => {
+                b.className = 'event-type-tab px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+            });
+            btn.className = 'event-type-tab px-3 py-1.5 rounded-lg text-sm font-semibold bg-blue-500 text-white transition';
+            document.getElementById('evt-opponent-row').classList.toggle('hidden', type !== 'game');
+        }
+        function submitCreateEvent() {
+            const title = document.getElementById('evt-title').value.trim();
+            const date  = document.getElementById('evt-date').value;
+            if (!title || !date) { showToast('Please fill in required fields.','error'); return; }
+            closeCreateEventModal();
+            showToast('Event "' + title + '" created!', 'success');
+            if (document.getElementById('cal-month-view') && !document.getElementById('cal-month-view').classList.contains('hidden')) {
+                renderMonthCalendar();
+            }
+        }
+
+        // Month Calendar
+        const MONTH_EVENTS = {
+            '2024-02-05': [{ label:'U12 Game', color:'bg-green-500' }],
+            '2024-02-07': [{ label:'Varsity Practice', color:'bg-blue-500' }, { label:'Parent Mtg', color:'bg-amber-500' }],
+            '2024-02-10': [{ label:'Coaches Meeting', color:'bg-purple-500' }],
+            '2024-02-12': [{ label:'JV Practice', color:'bg-blue-400' }],
+            '2024-02-14': [{ label:'U10 Game', color:'bg-green-500' }],
+            '2024-02-19': [{ label:'JV Practice', color:'bg-blue-400' }],
+            '2024-02-21': [{ label:'Varsity Practice', color:'bg-blue-500' }],
+            '2024-02-23': [{ label:'Varsity Practice', color:'bg-blue-500' }, { label:'Parent Mtg', color:'bg-amber-500' }],
+            '2024-02-24': [{ label:'U12 Game', color:'bg-green-500' }, { label:'Varsity Game', color:'bg-green-600' }],
+            '2024-02-26': [{ label:'Varsity Practice', color:'bg-blue-500' }],
+            '2024-02-28': [{ label:'Forms Deadline', color:'bg-red-500' }],
+            '2024-03-02': [{ label:'U12 Game', color:'bg-green-500' }],
+            '2024-03-06': [{ label:'Coaches Meeting', color:'bg-purple-500' }],
+            '2024-03-09': [{ label:'JV Practice', color:'bg-blue-400' }, { label:'U10 Game', color:'bg-green-500' }],
+        };
+        let calYear = 2024, calMonth = 1; // 0-indexed, Feb = 1
+
+        function renderMonthCalendar() {
+            const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            document.getElementById('month-label').textContent = monthNames[calMonth] + ' ' + calYear;
+            const grid = document.getElementById('month-grid');
+            grid.innerHTML = '';
+            const firstDay = new Date(calYear, calMonth, 1).getDay();
+            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+            const today = new Date();
+            // Leading empty cells
+            for (let i = 0; i < firstDay; i++) {
+                grid.insertAdjacentHTML('beforeend', '<div class="min-h-[90px] border-b border-r border-slate-100 bg-slate-50/50 p-1"></div>');
+            }
+            for (let d = 1; d <= daysInMonth; d++) {
+                const iso = calYear + '-' + String(calMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+                const isToday = today.getFullYear() === calYear && today.getMonth() === calMonth && today.getDate() === d;
+                const events = MONTH_EVENTS[iso] || [];
+                const evHtml = events.slice(0,3).map(ev =>
+                    `<div class="${ev.color} text-white text-xs rounded px-1 py-0.5 truncate cursor-pointer hover:opacity-80 transition" onclick="showToast('${ev.label}','info')">${ev.label}</div>`
+                ).join('');
+                const more = events.length > 3 ? `<div class="text-xs text-slate-400 font-semibold">+${events.length-3} more</div>` : '';
+                grid.insertAdjacentHTML('beforeend', `
+                    <div class="min-h-[90px] border-b border-r border-slate-100 p-1.5 ${isToday ? 'bg-brand-50' : 'hover:bg-slate-50'} transition">
+                        <div class="flex justify-end mb-1">
+                            <span class="w-6 h-6 flex items-center justify-center rounded-full text-sm font-bold ${isToday ? 'bg-brand-500 text-white' : 'text-slate-700'}">${d}</span>
+                        </div>
+                        <div class="space-y-0.5">${evHtml}${more}</div>
+                    </div>
+                `);
+            }
+            // Trailing cells to complete row
+            const filled = firstDay + daysInMonth;
+            const trail = (7 - (filled % 7)) % 7;
+            for (let i = 0; i < trail; i++) {
+                grid.insertAdjacentHTML('beforeend', '<div class="min-h-[90px] border-b border-r border-slate-100 bg-slate-50/50 p-1"></div>');
+            }
+        }
+
+        function shiftMonth(dir) {
+            calMonth += dir;
+            if (calMonth > 11) { calMonth = 0; calYear++; }
+            if (calMonth < 0)  { calMonth = 11; calYear--; }
+            renderMonthCalendar();
+        }
+
+        // Patch setCalView to render month on first open
+        const _origSetCalView = setCalView;
+        // Override already defined below — render on switch
+        function setCalView(view) {
+            ['week','list','month'].forEach(v => {
+                document.getElementById('cal-' + v + '-view').classList.toggle('hidden', v !== view);
+                const btn = document.getElementById('cal-' + v + '-btn');
+                btn.className = v === view
+                    ? 'px-3 py-1.5 rounded-md text-sm font-semibold bg-white shadow-sm text-slate-900 transition'
+                    : 'px-3 py-1.5 rounded-md text-sm font-semibold text-slate-500 transition';
+            });
+            if (view === 'month') renderMonthCalendar();
         }
 
         // Inventory filtering
