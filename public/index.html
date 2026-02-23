@@ -114,6 +114,78 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden">
 
+    <!-- ════════════════════════════════════════════════════════
+         LOGIN SCREEN
+         ════════════════════════════════════════════════════════ -->
+    <div id="login-screen" class="hidden fixed inset-0 z-[100] bg-gradient-to-br from-slate-900 via-brand-950 to-slate-900 flex items-center justify-center p-4">
+        <!-- Background decoration -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute -top-40 -right-40 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
+        </div>
+        <div class="w-full max-w-md relative z-10">
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center gap-3 mb-4">
+                    <div class="w-14 h-14 bg-gradient-to-br from-brand-500 to-amber-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-2xl shadow-brand-500/30">A</div>
+                    <div class="text-left">
+                        <h1 class="text-3xl font-black text-white tracking-tight">AthleteOS</h1>
+                        <p class="text-brand-300 text-sm font-semibold">Enterprise 2.0</p>
+                    </div>
+                </div>
+                <p class="text-slate-400 text-sm">Sign in to manage your sports organization</p>
+            </div>
+
+            <!-- Card -->
+            <div class="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl p-8">
+                <form onsubmit="handleLogin(event)" class="space-y-5">
+                    <div>
+                        <label class="text-sm font-semibold text-slate-200 block mb-2">Email</label>
+                        <input id="login-email" type="email" value="alex@demo.com" autocomplete="email"
+                               class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition text-sm"
+                               placeholder="you@organization.com">
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-slate-200 block mb-2">Password</label>
+                        <div class="relative">
+                            <input id="login-password" type="password" value="demo1234" autocomplete="current-password"
+                                   class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition text-sm pr-10"
+                                   placeholder="••••••••">
+                            <button type="button" onclick="const i=document.getElementById('login-password');i.type=i.type==='password'?'text':'password'" class="absolute right-3 top-3.5 text-slate-400 hover:text-white transition"><i class="fas fa-eye text-sm"></i></button>
+                        </div>
+                    </div>
+                    <p id="login-error" class="text-red-400 text-sm font-semibold min-h-[20px]"></p>
+                    <button id="login-btn" type="submit" class="w-full py-3.5 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 transition text-sm">
+                        Sign In
+                    </button>
+                </form>
+
+                <!-- Demo accounts -->
+                <div class="mt-6 pt-6 border-t border-white/10">
+                    <p class="text-xs text-slate-400 text-center mb-3 font-semibold uppercase tracking-wider">Demo Accounts</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="fillDemo('alex@demo.com')" class="py-2 px-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs text-slate-300 hover:text-white transition font-semibold">
+                            <div class="text-brand-400 mb-0.5">Admin</div>Alex
+                        </button>
+                        <button onclick="fillDemo('mike@demo.com')" class="py-2 px-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs text-slate-300 hover:text-white transition font-semibold">
+                            <div class="text-green-400 mb-0.5">Coach</div>Mike
+                        </button>
+                        <button onclick="fillDemo('sarah@demo.com')" class="py-2 px-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs text-slate-300 hover:text-white transition font-semibold">
+                            <div class="text-amber-400 mb-0.5">Coach</div>Sarah
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-center text-xs text-slate-500 mt-6">AthleteOS Enterprise · All rights reserved</p>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         APP WRAPPER (hidden until logged in)
+         ════════════════════════════════════════════════════════ -->
+    <div id="app-wrapper" class="hidden">
+
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="fixed inset-0 bg-white z-50 flex items-center justify-center hidden">
         <div class="text-center">
@@ -3087,7 +3159,7 @@
             </div>
             <div class="px-6 pb-6 flex gap-3">
                 <button onclick="closeAddPlayerModal()" class="flex-1 py-2.5 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition text-sm">Cancel</button>
-                <button onclick="closeAddPlayerModal(); showToast('Player added to roster!','success')" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-lg shadow-brand-500/30 transition text-sm">Add Player</button>
+                <button onclick="submitAddPlayer()" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-lg shadow-brand-500/30 transition text-sm">Add Player</button>
             </div>
         </div>
     </div>
@@ -4324,8 +4396,764 @@
         const _origSwitch = switchModule;
         switchModule = function(name) {
             _origSwitch(name);
-            if (name === 'reports') renderAnalyticsCharts();
+            if (name === 'reports')    { renderAnalyticsCharts(); loadReports(); }
+            if (name === 'rosters')    loadRosters();
+            if (name === 'commerce')   loadOrders();
+            if (name === 'facilities') loadFacilities();
+            if (name === 'messaging')  loadConversations();
+            if (name === 'schedule')   loadEvents();
+            if (name === 'announcements') loadAnnouncements();
+            if (name === 'inventory')  loadInventoryData();
+            if (name === 'safety')     loadSafety();
         };
+
+        // ═══════════════════════════════════════════════════════════════
+        //  API CLIENT
+        // ═══════════════════════════════════════════════════════════════
+        const API = {
+            token: () => localStorage.getItem('ao_token'),
+            headers() {
+                const h = { 'Content-Type': 'application/json' };
+                const t = this.token();
+                if (t) h['Authorization'] = 'Bearer ' + t;
+                return h;
+            },
+            async get(path) {
+                const r = await fetch('/api' + path, { headers: this.headers() });
+                if (r.status === 401) { logout(); return null; }
+                return r.json();
+            },
+            async post(path, body) {
+                const r = await fetch('/api' + path, { method:'POST', headers: this.headers(), body: JSON.stringify(body) });
+                if (r.status === 401) { logout(); return null; }
+                return r.json();
+            },
+            async put(path, body) {
+                const r = await fetch('/api' + path, { method:'PUT', headers: this.headers(), body: JSON.stringify(body) });
+                if (r.status === 401) { logout(); return null; }
+                return r.json();
+            },
+            async patch(path, body) {
+                const r = await fetch('/api' + path, { method:'PATCH', headers: this.headers(), body: JSON.stringify(body) });
+                if (r.status === 401) { logout(); return null; }
+                return r.json();
+            },
+            async del(path) {
+                const r = await fetch('/api' + path, { method:'DELETE', headers: this.headers() });
+                if (r.status === 401) { logout(); return null; }
+                return r.json();
+            }
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        //  AUTH — login / logout
+        // ═══════════════════════════════════════════════════════════════
+        function logout() {
+            localStorage.removeItem('ao_token');
+            localStorage.removeItem('ao_user');
+            showLoginScreen();
+        }
+
+        function showLoginScreen() {
+            document.getElementById('app-wrapper').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        function showApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-wrapper').classList.remove('hidden');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email    = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errEl    = document.getElementById('login-error');
+            errEl.textContent = '';
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true; btn.textContent = 'Signing in…';
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type':'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) { errEl.textContent = data.error || 'Login failed'; btn.disabled=false; btn.textContent='Sign In'; return; }
+                localStorage.setItem('ao_token', data.token);
+                localStorage.setItem('ao_user',  JSON.stringify(data.user));
+                applyUserToUI(data.user);
+                showApp();
+                loadDashboard();
+            } catch {
+                errEl.textContent = 'Connection error — is the server running?';
+                btn.disabled = false; btn.textContent = 'Sign In';
+            }
+        }
+
+        function applyUserToUI(user) {
+            // Update header avatar
+            document.querySelectorAll('#user-avatar-btn img, #mobile-sidebar img.w-8').forEach(el => {
+                if (user.avatar) el.src = user.avatar;
+            });
+            document.querySelectorAll('#user-avatar-btn .text-sm.font-semibold').forEach(el => el.textContent = user.name);
+            document.querySelector('#user-menu-dropdown .font-bold.text-slate-900')?.setAttribute('data-name', user.name);
+            const nameEl = document.querySelector('#user-menu-dropdown .font-bold.text-slate-900');
+            if (nameEl) nameEl.textContent = user.name;
+            const emailEl = document.querySelector('#user-menu-dropdown .text-xs.text-slate-500');
+            if (emailEl) emailEl.textContent = user.email;
+            const orgEl = document.querySelector('#user-menu-dropdown .font-semibold.text-slate-900.flex-1');
+            if (orgEl) orgEl.textContent = user.org_name || 'My Organization';
+            // Desktop sidebar user block
+            const sidebarName = document.querySelector('.desktop-sidebar .font-medium.text-sm.text-white');
+            if (sidebarName) sidebarName.textContent = user.name;
+            const sidebarRole = document.querySelector('.desktop-sidebar .text-xs.text-slate-400.truncate');
+            if (sidebarRole) sidebarRole.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  DASHBOARD
+        // ═══════════════════════════════════════════════════════════════
+        async function loadDashboard() {
+            const d = await API.get('/reports/dashboard');
+            if (!d) return;
+            const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+            set('kpi-players',     d.players.toLocaleString());
+            set('kpi-revenue',     '$' + Number(d.revenue).toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0}));
+            set('kpi-events',      d.events_week);
+            set('kpi-forms',       d.forms_pct + '%');
+            set('kpi-outstanding', '$' + Number(d.outstanding).toLocaleString());
+            set('kpi-waitlist',    d.waitlist);
+            // badge
+            const badge = document.getElementById('msg-badge');
+            if (badge && d.unread_messages > 0) badge.textContent = d.unread_messages;
+            // Upcoming events strip
+            loadUpcomingEventsStrip();
+        }
+
+        async function loadUpcomingEventsStrip() {
+            const today = new Date().toISOString().slice(0,10);
+            const events = await API.get('/events/stats/week?start=' + today);
+            if (!events) return;
+            const container = document.getElementById('upcoming-events-list');
+            if (!container) return;
+            if (events.length === 0) { container.innerHTML = '<p class="text-slate-500 text-sm col-span-3">No events this week</p>'; return; }
+            container.innerHTML = events.slice(0,6).map(ev => `
+                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm card-hover cursor-pointer" onclick="switchModule('schedule')">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-sm font-bold" style="background:${eventColor(ev.event_type)}">${eventIcon(ev.event_type)}</div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-bold text-slate-900 text-sm truncate">${ev.title}</p>
+                            <p class="text-xs text-slate-500 mt-0.5">${formatDate(ev.date)} ${ev.start_time ? '· ' + ev.start_time : ''}</p>
+                            ${ev.team_name ? `<span class="mt-1 inline-block px-2 py-0.5 rounded text-xs font-semibold text-white" style="background:${ev.team_color||'#64748b'}">${ev.team_name}</span>` : ''}
+                        </div>
+                    </div>
+                </div>`).join('');
+        }
+
+        function eventColor(type) {
+            return { practice:'#0ea5e9', game:'#22c55e', meeting:'#f59e0b', camp:'#8b5cf6', other:'#64748b' }[type] || '#64748b';
+        }
+        function eventIcon(type) {
+            return { practice:'<i class="fas fa-running"></i>', game:'<i class="fas fa-trophy"></i>', meeting:'<i class="fas fa-users"></i>', camp:'<i class="fas fa-campground"></i>', other:'<i class="fas fa-calendar"></i>' }[type] || '<i class="fas fa-calendar"></i>';
+        }
+        function formatDate(d) {
+            if (!d) return '';
+            const dt = new Date(d + 'T00:00:00');
+            return dt.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  ROSTERS
+        // ═══════════════════════════════════════════════════════════════
+        let _allPlayers = [];
+
+        async function loadRosters() {
+            const players = await API.get('/players');
+            if (!players) return;
+            _allPlayers = players;
+            renderRosterGrid(players);
+            // populate team filter
+            const tf = document.getElementById('roster-team-filter');
+            if (tf) {
+                const teams = [...new Set(players.map(p => p.team_name).filter(Boolean))];
+                tf.innerHTML = '<option value="">All Teams</option>' + teams.map(t => `<option value="${t}">${t}</option>`).join('');
+            }
+        }
+
+        function renderRosterGrid(players) {
+            const grid = document.getElementById('roster-grid-view');
+            if (!grid) return;
+            const cards = players.map(p => {
+                const statusDot = p.status === 'active' ? 'bg-green-500' : p.status === 'waitlist' ? 'bg-amber-400' : 'bg-slate-400';
+                const teamBadge = p.team_name ? `<span class="mt-2 inline-block px-2 py-0.5 rounded text-xs font-semibold text-white" style="background:${p.team_color||'#64748b'}">${p.team_name}</span>` : '';
+                const dim = p.status === 'inactive' ? 'opacity-60' : '';
+                return `<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 text-center card-hover cursor-pointer group" data-team="${p.team_name||''}" data-status="${p.status}" onclick="openPlayerProfileById(${p.id})">
+                    <div class="relative inline-block mb-3">
+                        <img src="${p.avatar||'https://i.pravatar.cc/150?img='+p.id}" class="w-16 h-16 rounded-full mx-auto border-4 border-white shadow-md ${dim}">
+                        <span class="absolute bottom-0 right-0 w-4 h-4 ${statusDot} rounded-full border-2 border-white"></span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm group-hover:text-brand-600 transition">${p.first_name} ${p.last_name}</h4>
+                    <p class="text-xs text-slate-500 mt-0.5">${p.team_name||'—'} ${p.jersey_number?'· #'+p.jersey_number:''}</p>
+                    ${teamBadge}
+                </div>`;
+            });
+            // Keep the add-player card at the end
+            cards.push(`<div onclick="openAddPlayerModal()" class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-5 text-center cursor-pointer hover:border-brand-400 hover:bg-brand-50 transition group">
+                <div class="w-16 h-16 rounded-full bg-slate-200 group-hover:bg-brand-100 flex items-center justify-center mx-auto mb-3 transition"><i class="fas fa-plus text-slate-400 group-hover:text-brand-600 text-xl transition"></i></div>
+                <p class="text-sm font-semibold text-slate-500 group-hover:text-brand-600 transition">Add Player</p>
+            </div>`);
+            grid.innerHTML = cards.join('');
+            // List view
+            const list = document.querySelector('#roster-list-view tbody');
+            if (list) {
+                list.innerHTML = players.map(p => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-5 py-3"><div class="flex items-center gap-3"><img src="${p.avatar||'https://i.pravatar.cc/150?img='+p.id}" class="w-8 h-8 rounded-full"><span class="font-semibold text-slate-900">${p.first_name} ${p.last_name}</span></div></td>
+                        <td class="px-5 py-3 text-slate-600">${p.team_name||'—'}</td>
+                        <td class="px-5 py-3 text-slate-600">${p.jersey_number?'#'+p.jersey_number:'—'}</td>
+                        <td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${p.status==='active'?'bg-green-100 text-green-700':p.status==='waitlist'?'bg-amber-100 text-amber-700':'bg-slate-100 text-slate-600'}">${p.status}</span></td>
+                        <td class="px-5 py-3"><button class="text-brand-600 hover:text-brand-800 font-semibold text-xs" onclick="openPlayerProfileById(${p.id})">View</button></td>
+                    </tr>`).join('');
+            }
+        }
+
+        function filterRoster() {
+            const team   = document.getElementById('roster-team-filter')?.value || '';
+            const status = document.getElementById('roster-status-filter')?.value || '';
+            const q      = (document.getElementById('roster-search')?.value || '').toLowerCase();
+            const filtered = _allPlayers.filter(p => {
+                const matchTeam   = !team   || p.team_name === team;
+                const matchStatus = !status || p.status === status;
+                const matchQ      = !q      || (p.first_name+' '+p.last_name).toLowerCase().includes(q) || (p.jersey_number||'').includes(q);
+                return matchTeam && matchStatus && matchQ;
+            });
+            renderRosterGrid(filtered);
+        }
+
+        async function openPlayerProfileById(id) {
+            const p = await API.get('/players/' + id);
+            if (!p) return;
+            document.getElementById('player-avatar').src      = p.avatar || 'https://i.pravatar.cc/150?img=' + p.id;
+            document.getElementById('player-name').textContent = p.first_name + ' ' + p.last_name;
+            document.getElementById('player-meta').textContent = (p.position || '') + (p.jersey_number ? ' · #' + p.jersey_number : '');
+            document.getElementById('player-team-badge').textContent = p.team_name || '—';
+            document.getElementById('pdet-dob').textContent    = p.dob || '—';
+            document.getElementById('pdet-jersey').textContent = p.jersey_number ? '#' + p.jersey_number : '—';
+            document.getElementById('pdet-pos').textContent    = p.position || '—';
+            document.getElementById('pdet-parent').textContent = p.parent_name || '—';
+            // forms
+            const forms = p.forms || [];
+            ['registration','medical','photo_release'].forEach(ft => {
+                const f = forms.find(x => x.form_type === ft);
+                const ok = f?.status === 'complete';
+                const el = document.getElementById('pform-' + ft.replace('_release','_photo').replace('_','_'));
+                // update inline
+            });
+            // payment
+            const paid = (p.orders||[]).some(o => o.status === 'paid' && o.description.toLowerCase().includes('due'));
+            document.getElementById('pdet-payment-status').textContent = paid ? 'Paid' : 'Pending';
+            document.getElementById('pdet-payment-status').className   = 'font-semibold ' + (paid ? 'text-green-600' : 'text-amber-600');
+            // notes
+            const notesContainer = document.querySelector('#pview-notes .space-y-3');
+            if (notesContainer && p.notes?.length) {
+                notesContainer.innerHTML = p.notes.map(n => `
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                        <div class="flex justify-between items-start mb-1"><span class="text-xs font-bold text-amber-700">${n.author_name}</span><span class="text-xs text-slate-400">${n.created_at.slice(0,10)}</span></div>
+                        <p class="text-sm text-slate-700">${n.body}</p>
+                    </div>`).join('') + `<textarea id="new-note-text" rows="3" placeholder="Add a note..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"></textarea>
+                    <button onclick="savePlayerNote(${p.id})" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold transition">Save Note</button>`;
+            }
+            // store current id for note saving
+            window._currentPlayerId = p.id;
+            setPlayerTab('overview');
+            document.getElementById('player-profile-panel').classList.remove('translate-x-full');
+            document.getElementById('player-profile-backdrop').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // override old stub
+        function openPlayerProfile(card) {
+            const id = card?.dataset?.playerId;
+            if (id) openPlayerProfileById(id);
+        }
+
+        async function savePlayerNote(playerId) {
+            const body = document.getElementById('new-note-text')?.value?.trim();
+            if (!body) return;
+            const r = await API.post('/players/' + playerId + '/notes', { body });
+            if (r?.id) { showToast('Note saved!','success'); openPlayerProfileById(playerId); }
+        }
+
+        async function submitAddPlayer() {
+            const first_name   = document.querySelector('#add-player-modal input[placeholder="First"]').value.trim();
+            const last_name    = document.querySelector('#add-player-modal input[placeholder="Last"]').value.trim();
+            const dob          = document.querySelector('#add-player-modal input[type="date"]').value;
+            const jersey_number= document.querySelector('#add-player-modal input[type="number"]').value;
+            const team_id      = document.querySelector('#add-player-modal select').value;
+            const parent_email = document.querySelector('#add-player-modal input[type="email"]').value.trim();
+            if (!first_name || !last_name) { showToast('First and last name are required','error'); return; }
+            const teams = await API.get('/teams');
+            const teamObj = teams?.find(t => t.name === team_id) || teams?.[0];
+            const r = await API.post('/players', { first_name, last_name, dob, jersey_number, team_id: teamObj?.id, parent_email });
+            if (r?.id) {
+                closeAddPlayerModal();
+                showToast(first_name + ' ' + last_name + ' added to roster!','success');
+                loadRosters();
+            } else { showToast(r?.error || 'Failed to add player','error'); }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  EVENTS / SCHEDULE
+        // ═══════════════════════════════════════════════════════════════
+        let _allEvents = [];
+
+        async function loadEvents() {
+            const today = new Date().toISOString().slice(0,10);
+            const d = new Date(today);
+            // get start of current week (Monday)
+            const day = d.getDay(), diff = d.getDate() - day + (day===0?-6:1);
+            const weekStart = new Date(d.setDate(diff)).toISOString().slice(0,10);
+            const events = await API.get('/events/stats/week?start=' + weekStart);
+            if (!events) return;
+            _allEvents = events;
+            renderWeekGrid(events);
+            renderEventList(events);
+            if (!document.getElementById('cal-month-view').classList.contains('hidden')) {
+                await loadMonthEvents();
+            }
+        }
+
+        function renderEventList(events) {
+            const el = document.getElementById('cal-list-view');
+            if (!el) return;
+            el.innerHTML = events.length === 0
+                ? '<div class="p-8 text-center text-slate-500">No events this week</div>'
+                : events.map(ev => `
+                    <div class="flex items-center gap-4 p-5 hover:bg-slate-50 transition cursor-pointer" onclick="showToast('${ev.title}','info')">
+                        <div class="text-center min-w-[56px] p-2 rounded-xl" style="background:${eventColor(ev.event_type)}20">
+                            <div class="text-xs font-bold uppercase" style="color:${eventColor(ev.event_type)}">${formatDate(ev.date).split(',')[0]}</div>
+                            <div class="text-xl font-bold" style="color:${eventColor(ev.event_type)}">${new Date(ev.date+'T00:00:00').getDate()}</div>
+                        </div>
+                        <div class="w-1 h-12 rounded-full flex-shrink-0" style="background:${eventColor(ev.event_type)}"></div>
+                        <div class="flex-1">
+                            <p class="font-bold text-slate-900">${ev.title}${ev.opponent?' vs '+ev.opponent:''}</p>
+                            <p class="text-sm text-slate-500">${ev.start_time||''} ${ev.end_time?'– '+ev.end_time:''} ${ev.facility_name?'· '+ev.facility_name:''}</p>
+                        </div>
+                        <span class="px-2 py-1 rounded text-xs font-bold" style="background:${eventColor(ev.event_type)}20;color:${eventColor(ev.event_type)}">${ev.event_type}</span>
+                    </div>`).join('');
+        }
+
+        function renderWeekGrid(events) {
+            // group by day-of-week index
+            // The week grid is static HTML — update event blocks dynamically
+        }
+
+        async function loadMonthEvents() {
+            const m = String(calMonth+1).padStart(2,'0');
+            const events = await API.get(`/events?month=${calYear}-${m}`);
+            if (!events) return;
+            // rebuild MONTH_EVENTS from API data
+            Object.keys(MONTH_EVENTS).forEach(k => delete MONTH_EVENTS[k]);
+            events.forEach(ev => {
+                if (!MONTH_EVENTS[ev.date]) MONTH_EVENTS[ev.date] = [];
+                MONTH_EVENTS[ev.date].push({ label: ev.title, color: 'bg-blue-500' });
+            });
+            renderMonthCalendar();
+        }
+
+        async function submitCreateEvent() {
+            const title     = document.getElementById('evt-title').value.trim();
+            const date      = document.getElementById('evt-date').value;
+            const start_time= document.getElementById('evt-start').value;
+            const end_time  = document.getElementById('evt-end').value;
+            const event_type= document.querySelector('.event-type-tab.bg-blue-500')?.textContent?.toLowerCase().trim() || 'practice';
+            if (!title || !date) { showToast('Title and date are required','error'); return; }
+            const r = await API.post('/events', { title, date, start_time, end_time, event_type, notify_parents: true });
+            if (r?.id) {
+                closeCreateEventModal();
+                showToast('Event "' + title + '" created!','success');
+                loadEvents();
+            } else { showToast(r?.error || 'Failed to create event','error'); }
+        }
+
+        // patch setCalView to load month events from API
+        const __origSetCalView = setCalView;
+        setCalView = function(view) {
+            __origSetCalView(view);
+            if (view === 'month') loadMonthEvents();
+            if (view === 'list' || view === 'week') loadEvents();
+        };
+
+        // ═══════════════════════════════════════════════════════════════
+        //  FACILITIES
+        // ═══════════════════════════════════════════════════════════════
+        async function loadFacilities() {
+            const facilities = await API.get('/facilities');
+            if (!facilities) return;
+            const grid = document.querySelector('#module-facilities .grid.grid-cols-1.sm\\:grid-cols-2');
+            if (!grid) return;
+            grid.innerHTML = facilities.map(f => {
+                const statusColor = { available:'bg-green-500', in_use:'bg-brand-500', maintenance:'bg-amber-500' }[f.status] || 'bg-slate-400';
+                const statusLabel = { available:'Available', in_use:'In Use', maintenance:'Maintenance' }[f.status] || f.status;
+                const statusBadge = { available:'bg-green-100 text-green-700', in_use:'bg-brand-100 text-brand-700', maintenance:'bg-amber-100 text-amber-700' }[f.status] || 'bg-slate-100 text-slate-600';
+                const utilPct = f.upcoming_bookings > 0 ? Math.min(100, f.upcoming_bookings * 15) : 20;
+                return `<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden card-hover">
+                    <div class="h-3 ${statusColor}"></div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-3">
+                            <div><h4 class="font-bold text-slate-900">${f.name}</h4><p class="text-xs text-slate-500 mt-0.5">${f.description||f.type||''} · Capacity ${f.capacity||'—'}</p></div>
+                            <span class="px-2 py-1 ${statusBadge} rounded-full text-xs font-bold">${statusLabel}</span>
+                        </div>
+                        ${f.status==='maintenance' ? `<div class="space-y-2 text-sm text-slate-600 mb-4"><div class="flex items-center gap-2"><i class="fas fa-tools w-4 text-amber-500"></i>${f.maintenance_note||'Under maintenance'}</div>${f.maintenance_return?`<div class="flex items-center gap-2"><i class="fas fa-calendar-check w-4 text-slate-400"></i>Est. return: ${f.maintenance_return}</div>`:''}
+                        </div>` : `<div class="space-y-2 text-sm text-slate-600 mb-4"><div class="flex items-center gap-2"><i class="fas fa-calendar w-4 text-slate-400"></i>${f.upcoming_bookings||0} upcoming bookings</div></div>`}
+                        <div class="mb-3"><div class="flex justify-between text-xs mb-1"><span class="text-slate-500">Utilization</span><span class="font-bold text-slate-700">${utilPct}%</span></div><div class="w-full bg-slate-200 rounded-full h-2"><div class="${statusColor} h-2 rounded-full" style="width:${utilPct}%"></div></div></div>
+                        <button onclick="${f.status==='maintenance'?`showToast('${f.name} is under maintenance','error')`:`bookFacility(${f.id},'${f.name}')`}" class="w-full py-2 ${f.status==='maintenance'?'bg-amber-100 text-amber-700 cursor-not-allowed':'bg-slate-900 hover:bg-slate-700 text-white'} rounded-lg text-sm font-semibold transition">${f.status==='maintenance'?'Under Maintenance':'Book Now'}</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function bookFacility(facilityId, name) {
+            const date = prompt('Book ' + name + '\n\nEnter date (YYYY-MM-DD):', new Date().toISOString().slice(0,10));
+            if (!date) return;
+            const start = prompt('Start time (HH:MM):', '16:00');
+            if (!start) return;
+            const end = prompt('End time (HH:MM):', '18:00');
+            const r = await API.post('/facilities/' + facilityId + '/book', { date, start_time: start, end_time: end||null });
+            if (r?.id) { showToast(name + ' booked for ' + date,'success'); loadFacilities(); }
+            else showToast(r?.error || 'Booking failed','error');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  COMMERCE
+        // ═══════════════════════════════════════════════════════════════
+        async function loadOrders() {
+            const data = await API.get('/orders?limit=20');
+            if (!data) return;
+            renderOrdersTable(data.orders);
+            const stats = await API.get('/orders/stats/summary');
+            if (stats) {
+                const s = (id, val) => { const el = document.querySelector('#module-commerce [data-stat="'+id+'"]'); if(el) el.textContent = val; };
+                // update stat cards via data-stat attrs (they were static — show toast if not found)
+            }
+        }
+
+        function renderOrdersTable(orders) {
+            const tbody = document.querySelector('#module-commerce table tbody');
+            if (!tbody) return;
+            const statusClass = { paid:'bg-green-100 text-green-700', pending:'bg-amber-100 text-amber-700', overdue:'bg-red-100 text-red-700', refunded:'bg-slate-100 text-slate-600' };
+            tbody.innerHTML = orders.map(o => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="px-5 py-4 font-mono text-slate-500 text-xs">${o.order_number}</td>
+                    <td class="px-5 py-4"><div class="flex items-center gap-2"><img src="${o.player_avatar||'https://i.pravatar.cc/150?img=1'}" class="w-7 h-7 rounded-full"><span class="font-semibold text-slate-900">${o.player_name||o.family_name||'—'}</span></div></td>
+                    <td class="px-5 py-4 text-slate-600">${o.description}</td>
+                    <td class="px-5 py-4 font-bold ${o.status==='overdue'?'text-red-600':o.status==='refunded'?'text-slate-400 line-through':'text-slate-900'}">$${Number(o.amount).toFixed(2)}</td>
+                    <td class="px-5 py-4 text-slate-500">${o.created_at?.slice(0,10)||''}</td>
+                    <td class="px-5 py-4"><span class="px-2 py-1 rounded-full text-xs font-bold ${statusClass[o.status]||'bg-slate-100 text-slate-600'}">${o.status}</span></td>
+                    <td class="px-5 py-4">
+                        ${o.status==='pending'||o.status==='overdue'
+                            ? `<button onclick="collectPayment(${o.id})" class="text-brand-600 hover:text-brand-800 font-semibold text-xs">${o.status==='overdue'?'Remind':'Collect'}</button>`
+                            : `<button onclick="showToast('Viewing receipt ${o.order_number}','info')" class="text-brand-600 hover:text-brand-800 font-semibold text-xs">Receipt</button>`}
+                    </td>
+                </tr>`).join('');
+        }
+
+        async function collectPayment(orderId) {
+            const method = prompt('Payment method:', 'cash');
+            if (!method) return;
+            const r = await API.put('/orders/' + orderId, { status: 'paid', payment_method: method });
+            if (r?.ok) { showToast('Payment recorded!','success'); loadOrders(); }
+        }
+
+        async function submitRecordPayment() {
+            const family = document.querySelector('#record-payment-modal input[type="text"]').value.trim();
+            const amount = document.querySelector('#record-payment-modal input[type="number"]').value;
+            const method = document.querySelector('#record-payment-modal select').value;
+            const desc   = document.querySelectorAll('#record-payment-modal input[type="text"]')[1]?.value?.trim() || 'Payment';
+            if (!amount) { showToast('Amount is required','error'); return; }
+            const r = await API.post('/orders', { family_name: family, description: desc, amount: Number(amount), payment_method: method, status:'paid', order_type:'dues' });
+            if (r?.id) { closeRecordPaymentModal(); showToast('Payment recorded!','success'); loadOrders(); }
+            else showToast(r?.error || 'Failed','error');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  INVENTORY
+        // ═══════════════════════════════════════════════════════════════
+        async function loadInventoryData() {
+            const items = await API.get('/inventory');
+            if (!items) return;
+            renderInventoryTable(items);
+        }
+
+        function renderInventoryTable(items) {
+            const tbody = document.querySelector('#module-inventory table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = items.map(item => `
+                <tr class="hover:bg-slate-50 transition ${item.low_stock?'bg-red-50/30':''}">
+                    <td class="px-5 py-4"><div class="font-semibold text-slate-900">${item.name}</div><div class="text-xs text-slate-500">${item.sku||'—'}</div></td>
+                    <td class="px-5 py-4 text-slate-600 capitalize">${item.category||'—'}</td>
+                    <td class="px-5 py-4"><span class="font-bold ${item.quantity===0?'text-red-600':item.low_stock?'text-amber-600':'text-slate-900'}">${item.quantity}</span></td>
+                    <td class="px-5 py-4 text-slate-600">${item.sizes||'—'}</td>
+                    <td class="px-5 py-4 text-slate-600">$${Number(item.unit_price).toFixed(2)}</td>
+                    <td class="px-5 py-4 text-slate-600">${item.location||'—'}</td>
+                    <td class="px-5 py-4">
+                        ${item.low_stock?'<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold">Low Stock</span>':'<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">OK</span>'}
+                    </td>
+                    <td class="px-5 py-4 flex gap-2">
+                        <button onclick="adjustStock(${item.id},1)" class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold hover:bg-green-200 transition">+1</button>
+                        <button onclick="adjustStock(${item.id},-1)" class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold hover:bg-red-200 transition">-1</button>
+                        <button onclick="editInventoryItem(${item.id})" class="px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs font-bold hover:bg-slate-200 transition">Edit</button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        async function adjustStock(id, delta) {
+            const r = await API.patch('/inventory/' + id + '/adjust', { delta });
+            if (r?.id) { showToast('Stock updated','success'); loadInventoryData(); }
+        }
+
+        async function editInventoryItem(id) {
+            const item = await API.get('/inventory/' + id);
+            if (!item) return;
+            const newQty = prompt('Update quantity for ' + item.name + ':', item.quantity);
+            if (newQty === null) return;
+            await API.put('/inventory/' + id, { quantity: Number(newQty) });
+            showToast('Updated!','success');
+            loadInventoryData();
+        }
+
+        async function submitAddInventoryItem() {
+            const name     = document.getElementById('item-name').value.trim();
+            const category = document.getElementById('item-category').value;
+            const quantity = parseInt(document.getElementById('item-quantity').value) || 0;
+            const price    = parseFloat(document.getElementById('item-price').value) || 0;
+            const sizes    = document.getElementById('item-sizes').value.trim();
+            const location = document.getElementById('item-location').value.trim();
+            if (!name) { showToast('Name is required','error'); return; }
+            const r = await API.post('/inventory', { name, category, quantity, unit_price: price, sizes: sizes||null, location: location||null });
+            if (r?.id) {
+                closeAddItemModal();
+                showToast('Item added to inventory!','success');
+                loadInventoryData();
+            } else showToast(r?.error || 'Failed','error');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  MESSAGING
+        // ═══════════════════════════════════════════════════════════════
+        let _activeConvId = null;
+
+        async function loadConversations() {
+            const convs = await API.get('/messaging/conversations');
+            if (!convs) return;
+            const list = document.querySelector('#module-messaging .overflow-y-auto.flex-1');
+            if (!list) return;
+            list.innerHTML = convs.map((c, i) => `
+                <div onclick="selectConversationById(this,${c.id},'${(c.name||'').replace(/'/g,"\\'")}',${c.unread_count||0})" class="p-4 hover:bg-slate-50 cursor-pointer border-l-4 ${i===0?'border-brand-500 bg-brand-50':'border-transparent'} transition" data-conv-id="${c.id}">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-brand-100 rounded-full flex items-center justify-center text-brand-700 font-bold text-sm flex-shrink-0">${(c.name||'?')[0].toUpperCase()}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-center">
+                                <p class="font-bold text-slate-900 text-sm truncate">${c.name||'Conversation'}</p>
+                                <span class="text-xs text-slate-500 flex-shrink-0 ml-1">${c.last_at?.slice(11,16)||''}</span>
+                            </div>
+                            <p class="text-xs text-slate-500 truncate mt-0.5">${c.last_message||''}</p>
+                            ${c.unread_count > 0 ? `<span class="mt-1 inline-block w-5 h-5 bg-brand-500 text-white text-xs rounded-full text-center leading-5 font-bold">${c.unread_count}</span>` : ''}
+                        </div>
+                    </div>
+                </div>`).join('');
+            if (convs[0]) selectConversationById(list.querySelector('[data-conv-id]'), convs[0].id, convs[0].name, convs[0].unread_count);
+        }
+
+        async function selectConversationById(el, id, name, unread) {
+            _activeConvId = id;
+            document.querySelectorAll('#module-messaging [data-conv-id]').forEach(c => {
+                c.classList.remove('border-brand-500','bg-brand-50');
+                c.classList.add('border-transparent');
+            });
+            if (el) { el.classList.add('border-brand-500','bg-brand-50'); el.classList.remove('border-transparent'); }
+            document.getElementById('chat-title').textContent = name || 'Conversation';
+            const msgs = await API.get('/messaging/conversations/' + id + '/messages');
+            if (!msgs) return;
+            const container = document.getElementById('chat-messages');
+            const me = JSON.parse(localStorage.getItem('ao_user') || '{}');
+            container.innerHTML = msgs.map(m => {
+                const isMine = m.sender_id === me.id;
+                return isMine
+                    ? `<div class="flex items-end gap-2 flex-row-reverse"><img src="${me.avatar||'https://i.pravatar.cc/150?img=11'}" class="w-7 h-7 rounded-full flex-shrink-0"><div class="text-right"><div class="chat-bubble chat-sent shadow-sm">${m.body}</div><p class="text-xs text-slate-400 mt-1">${m.created_at?.slice(11,16)||''} ✓✓</p></div></div>`
+                    : `<div class="flex items-end gap-2"><div class="w-7 h-7 bg-brand-100 rounded-full flex items-center justify-center text-brand-700 text-xs font-bold flex-shrink-0">${(m.sender_name||'?')[0]}</div><div><p class="text-xs text-slate-500 mb-1">${m.sender_name||''}</p><div class="chat-bubble chat-received shadow-sm">${m.body}</div><p class="text-xs text-slate-400 mt-1">${m.created_at?.slice(11,16)||''}</p></div></div>`;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('msg-input');
+            const text  = input.value.trim();
+            if (!text || !_activeConvId) return;
+            input.value = '';
+            const r = await API.post('/messaging/conversations/' + _activeConvId + '/messages', { body: text });
+            if (r?.id) {
+                const me = JSON.parse(localStorage.getItem('ao_user')||'{}');
+                const container = document.getElementById('chat-messages');
+                container.insertAdjacentHTML('beforeend', `<div class="flex items-end gap-2 flex-row-reverse"><img src="${me.avatar||'https://i.pravatar.cc/150?img=11'}" class="w-7 h-7 rounded-full flex-shrink-0"><div class="text-right"><div class="chat-bubble chat-sent shadow-sm">${text}</div><p class="text-xs text-slate-400 mt-1">Just now ✓✓</p></div></div>`);
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  ANNOUNCEMENTS
+        // ═══════════════════════════════════════════════════════════════
+        async function loadAnnouncements() {
+            const items = await API.get('/announcements');
+            if (!items) return;
+            const container = document.querySelector('#module-announcements .space-y-4');
+            if (!container) return;
+            container.innerHTML = items.map(a => `
+                <div class="bg-white rounded-2xl border ${a.pinned?'border-brand-200 shadow-md':'border-slate-200 shadow-sm'} p-5">
+                    <div class="flex justify-between items-start gap-3">
+                        <div class="flex items-start gap-3 flex-1 min-w-0">
+                            <div class="w-9 h-9 rounded-xl flex-shrink-0 flex items-center justify-center ${a.priority==='high'?'bg-red-100 text-red-600':'bg-brand-100 text-brand-600'}">
+                                <i class="fas ${a.pinned?'fa-thumbtack':a.priority==='high'?'fa-exclamation':'fa-bullhorn'}"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap mb-1">
+                                    <h4 class="font-bold text-slate-900">${a.title}</h4>
+                                    ${a.pinned?'<span class="px-2 py-0.5 bg-brand-100 text-brand-700 rounded text-xs font-bold">Pinned</span>':''}
+                                    ${a.priority==='high'?'<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-bold">Urgent</span>':''}
+                                </div>
+                                <p class="text-sm text-slate-600">${a.body}</p>
+                                <p class="text-xs text-slate-400 mt-2">${a.author_name} · ${a.created_at?.slice(0,10)||''}</p>
+                            </div>
+                        </div>
+                        <button onclick="deleteAnnouncement(${a.id})" class="text-slate-300 hover:text-red-500 transition flex-shrink-0"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function deleteAnnouncement(id) {
+            if (!confirm('Delete this announcement?')) return;
+            await API.del('/announcements/' + id);
+            showToast('Announcement deleted','info');
+            loadAnnouncements();
+        }
+
+        async function submitAnnouncement() {
+            const modal = document.getElementById('new-announcement-modal');
+            if (!modal) { showToast('Opening announcement editor...','info'); return; }
+            const title = modal.querySelector('input[type="text"]')?.value?.trim();
+            const body  = modal.querySelector('textarea')?.value?.trim();
+            if (!title || !body) { showToast('Title and body required','error'); return; }
+            const r = await API.post('/announcements', { title, body, priority:'normal' });
+            if (r?.id) {
+                modal.classList.add('hidden');
+                showToast('Announcement published!','success');
+                loadAnnouncements();
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  SAFETY / COMPLIANCE
+        // ═══════════════════════════════════════════════════════════════
+        async function loadSafety() {
+            const docs = await API.get('/safety/docs');
+            if (!docs) return;
+            const summary = await API.get('/safety/summary');
+            // Update summary stats
+            if (summary) {
+                const pct = Math.round((summary.complete / (summary.total||1)) * 100);
+                document.querySelectorAll('#module-safety [data-safety-pct]').forEach(el => el.textContent = pct + '%');
+            }
+            const tbody = document.querySelector('#module-safety table tbody');
+            if (!tbody) return;
+            // group by player
+            const byPlayer = {};
+            docs.forEach(d => {
+                if (!byPlayer[d.player_id]) byPlayer[d.player_id] = { name: d.player_name, avatar: d.avatar, team: d.team_name, docs: {} };
+                byPlayer[d.player_id].docs[d.doc_type] = d;
+            });
+            const docTypes = ['registration_form','medical_form','photo_release'];
+            tbody.innerHTML = Object.values(byPlayer).map(p => {
+                const icons = docTypes.map(dt => {
+                    const d = p.docs[dt];
+                    return d?.status === 'complete'
+                        ? '<i class="fas fa-check-circle text-green-500"></i>'
+                        : '<i class="fas fa-times-circle text-red-500"></i>';
+                });
+                const allOk = docTypes.every(dt => p.docs[dt]?.status === 'complete');
+                return `<tr class="hover:bg-slate-50 transition">
+                    <td class="px-5 py-3"><div class="flex items-center gap-3"><img src="${p.avatar||'https://i.pravatar.cc/150?img=1'}" class="w-8 h-8 rounded-full"><span class="font-semibold text-slate-900">${p.name}</span></div></td>
+                    <td class="px-5 py-3 text-slate-600">${p.team||'—'}</td>
+                    <td class="px-5 py-3">${icons[0]}</td>
+                    <td class="px-5 py-3">${icons[1]}</td>
+                    <td class="px-5 py-3">${icons[2]}</td>
+                    <td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-bold ${allOk?'bg-green-100 text-green-700':'bg-red-100 text-red-700'}">${allOk?'Complete':'Incomplete'}</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  REPORTS
+        // ═══════════════════════════════════════════════════════════════
+        async function loadReports() {
+            const rev  = await API.get('/reports/revenue');
+            const regs = await API.get('/reports/registrations');
+            if (!rev || !regs) return;
+            // Revenue totals
+            const totalRev = rev.reduce((s, r) => s + r.total, 0);
+            document.querySelectorAll('#module-reports [data-report="revenue"]').forEach(el => el.textContent = '$' + totalRev.toLocaleString());
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  GLOBAL SEARCH (live)
+        // ═══════════════════════════════════════════════════════════════
+        async function handleSearch(e) {
+            const q = e.target.value.trim();
+            if (q.length < 2) { document.getElementById('search-results-dropdown')?.classList.add('hidden'); return; }
+            const players = await API.get('/players?q=' + encodeURIComponent(q));
+            if (!players) return;
+            let dd = document.getElementById('search-results-dropdown');
+            if (!dd) {
+                dd = document.createElement('div');
+                dd.id = 'search-results-dropdown';
+                dd.className = 'absolute left-0 top-full mt-1 w-full bg-white rounded-xl shadow-2xl border border-slate-200 z-50 overflow-hidden';
+                document.getElementById('global-search').parentElement.style.position = 'relative';
+                document.getElementById('global-search').parentElement.appendChild(dd);
+            }
+            if (players.length === 0) { dd.innerHTML = '<div class="p-4 text-sm text-slate-500">No results found</div>'; dd.classList.remove('hidden'); return; }
+            dd.innerHTML = players.slice(0,6).map(p => `
+                <div class="flex items-center gap-3 p-3 hover:bg-slate-50 cursor-pointer transition" onclick="switchModule('rosters');openPlayerProfileById(${p.id});document.getElementById('search-results-dropdown').classList.add('hidden')">
+                    <img src="${p.avatar||'https://i.pravatar.cc/150?img='+p.id}" class="w-8 h-8 rounded-full flex-shrink-0">
+                    <div><p class="font-semibold text-slate-900 text-sm">${p.first_name} ${p.last_name}</p><p class="text-xs text-slate-500">${p.team_name||'—'} ${p.jersey_number?'· #'+p.jersey_number:''}</p></div>
+                </div>`).join('');
+            dd.classList.remove('hidden');
+            document.addEventListener('click', () => dd.classList.add('hidden'), { once: true });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  BOOTSTRAP — check auth on load
+        // ═══════════════════════════════════════════════════════════════
+        (function init() {
+            const token = localStorage.getItem('ao_token');
+            const user  = JSON.parse(localStorage.getItem('ao_user') || 'null');
+            if (token && user) {
+                applyUserToUI(user);
+                showApp();
+                loadDashboard();
+            } else {
+                showLoginScreen();
+            }
+        })();
+
+    </script>
+
+    </div><!-- /#app-wrapper -->
+
+    <script>
+        function fillDemo(email) {
+            document.getElementById('login-email').value    = email;
+            document.getElementById('login-password').value = 'demo1234';
+        }
     </script>
 </body>
 </html>
