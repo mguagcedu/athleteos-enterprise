@@ -954,19 +954,447 @@
             <p class="text-slate-600">Team communication module</p>
         </div>
         
-        <div id="module-announcements" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Announcements</h2>
-            <p class="text-slate-600">Broadcast and news module</p>
+        <div id="module-announcements" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900">Announcements</h2>
+                    <p class="text-slate-600 mt-1">Broadcast messages to players, parents &amp; coaches</p>
+                </div>
+                <button onclick="openAnnounceComposer()" class="bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-brand-500/30 transition flex items-center gap-2">
+                    <i class="fas fa-bullhorn"></i> New Announcement
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="text-2xl font-bold text-slate-900">47</div>
+                    <div class="text-sm text-slate-600">Total Sent</div>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="text-2xl font-bold text-brand-600">3</div>
+                    <div class="text-sm text-slate-600">This Week</div>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="text-2xl font-bold text-green-600">84%</div>
+                    <div class="text-sm text-slate-600">Avg Open Rate</div>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="text-2xl font-bold text-amber-600">2</div>
+                    <div class="text-sm text-slate-600">Scheduled</div>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                    <h3 class="font-bold text-slate-900">Recent Announcements</h3>
+                    <div class="flex gap-2">
+                        <select class="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                            <option>All Audiences</option>
+                            <option>All Parents</option>
+                            <option>Players</option>
+                            <option>Coaches</option>
+                        </select>
+                        <select class="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                            <option>All Status</option>
+                            <option>Sent</option>
+                            <option>Scheduled</option>
+                            <option>Draft</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="divide-y divide-slate-100">
+
+                    <div class="p-5 bg-brand-50 hover:bg-brand-100/50 transition cursor-pointer group">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-brand-100 rounded-xl flex items-center justify-center text-brand-600 flex-shrink-0"><i class="fas fa-thumbtack"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2 mb-1">
+                                    <h4 class="font-bold text-slate-900">Spring Season Kickoff — What You Need to Know</h4>
+                                    <span class="px-2 py-0.5 bg-brand-200 text-brand-800 rounded text-xs font-bold">Pinned</span>
+                                    <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-bold">Sent</span>
+                                </div>
+                                <p class="text-sm text-slate-600 mb-2">Practice begins March 1st at Central Fields. Please ensure all forms are submitted by Feb 28th and payments are complete.</p>
+                                <div class="flex flex-wrap gap-4 text-xs text-slate-500">
+                                    <span><i class="fas fa-users mr-1"></i>All Parents &amp; Players</span>
+                                    <span><i class="fas fa-calendar mr-1"></i>Feb 20, 2024</span>
+                                    <span><i class="fas fa-eye mr-1"></i>312 views</span>
+                                    <span class="text-green-600 font-semibold"><i class="fas fa-envelope-open mr-1"></i>91% opened</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-5 hover:bg-slate-50 transition cursor-pointer group">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 flex-shrink-0"><i class="fas fa-trophy"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2 mb-1">
+                                    <h4 class="font-bold text-slate-900">Tournament Registration Now Open</h4>
+                                    <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-bold">Sent</span>
+                                </div>
+                                <p class="text-sm text-slate-600 mb-2">Spring Invitational (Apr 20–21) is open. Limited to 8 teams — sign up by March 15th.</p>
+                                <div class="flex flex-wrap gap-4 text-xs text-slate-500">
+                                    <span><i class="fas fa-users mr-1"></i>Coaches &amp; Parents</span>
+                                    <span><i class="fas fa-calendar mr-1"></i>Feb 18, 2024</span>
+                                    <span><i class="fas fa-eye mr-1"></i>198 views</span>
+                                    <span class="text-green-600 font-semibold"><i class="fas fa-envelope-open mr-1"></i>78% opened</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-5 hover:bg-slate-50 transition cursor-pointer group">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 flex-shrink-0"><i class="fas fa-clock"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2 mb-1">
+                                    <h4 class="font-bold text-slate-900">Reminder: Forms Due Feb 28th</h4>
+                                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-bold">Scheduled</span>
+                                </div>
+                                <p class="text-sm text-slate-600 mb-2">Medical forms, liability waivers and emergency contacts must be submitted before the season begins.</p>
+                                <div class="flex flex-wrap gap-4 text-xs text-slate-500">
+                                    <span><i class="fas fa-users mr-1"></i>All Parents</span>
+                                    <span><i class="fas fa-calendar mr-1"></i>Sends Feb 25, 2024 at 9:00 AM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-5 hover:bg-slate-50 transition cursor-pointer group opacity-70">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 flex-shrink-0"><i class="fas fa-file-alt"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2 mb-1">
+                                    <h4 class="font-bold text-slate-700">End-of-Season Celebration Details</h4>
+                                    <span class="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-xs font-bold">Draft</span>
+                                </div>
+                                <p class="text-sm text-slate-500 mb-2">Join us May 18th at Riverside Park — food, awards ceremony, and fun for the whole family.</p>
+                                <div class="flex flex-wrap gap-4 text-xs text-slate-400">
+                                    <span><i class="fas fa-users mr-1"></i>All</span>
+                                    <span><i class="fas fa-edit mr-1"></i>Last edited Feb 16, 2024</span>
+                                </div>
+                            </div>
+                            <button onclick="openAnnounceComposer()" class="text-brand-600 hover:text-brand-800 text-sm font-semibold opacity-0 group-hover:opacity-100 transition flex-shrink-0">Edit</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
         
-        <div id="module-safety" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Safety & Compliance</h2>
-            <p class="text-slate-600">Document tracking and safety</p>
+        <div id="module-safety" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900">Safety &amp; Compliance</h2>
+                    <p class="text-slate-600 mt-1">Track required documents and certifications</p>
+                </div>
+                <button onclick="showToast('Opening document upload...', 'info')" class="bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-brand-500/30 transition flex items-center gap-2">
+                    <i class="fas fa-upload"></i> Upload Document
+                </button>
+            </div>
+
+            <!-- Compliance Score -->
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                    <div>
+                        <p class="text-slate-400 text-sm mb-1">Overall Compliance Score</p>
+                        <div class="flex items-end gap-3">
+                            <span class="text-5xl font-bold text-white">78%</span>
+                            <span class="text-amber-400 text-sm font-semibold mb-2 flex items-center gap-1"><i class="fas fa-exclamation-triangle"></i> 27 items pending</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-3 mt-3 overflow-hidden">
+                            <div class="bg-gradient-to-r from-amber-400 to-green-400 h-3 rounded-full" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div class="bg-white/10 rounded-xl p-3">
+                            <div class="text-2xl font-bold text-green-400">94</div>
+                            <div class="text-xs text-slate-400 mt-1">Complete</div>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-3">
+                            <div class="text-2xl font-bold text-amber-400">27</div>
+                            <div class="text-xs text-slate-400 mt-1">Pending</div>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-3">
+                            <div class="text-2xl font-bold text-red-400">4</div>
+                            <div class="text-xs text-slate-400 mt-1">Expired</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requirement Checklist -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Required Documents -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-5 border-b border-slate-200">
+                        <h3 class="font-bold text-slate-900">Required Documents</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Per player — Spring 2024</p>
+                    </div>
+                    <div class="divide-y divide-slate-100">
+
+                        <div class="flex items-center gap-4 px-5 py-3">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0"><i class="fas fa-check text-xs"></i></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-slate-900">Medical / Physical Form</p>
+                                <p class="text-xs text-slate-500">1,201 of 1,247 submitted</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs font-bold text-green-600 mb-1">96%</div>
+                                <div class="w-24 bg-slate-200 rounded-full h-1.5"><div class="bg-green-500 h-1.5 rounded-full" style="width:96%"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 px-5 py-3">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0"><i class="fas fa-check text-xs"></i></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-slate-900">Liability Waiver</p>
+                                <p class="text-xs text-slate-500">1,190 of 1,247 submitted</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs font-bold text-green-600 mb-1">95%</div>
+                                <div class="w-24 bg-slate-200 rounded-full h-1.5"><div class="bg-green-500 h-1.5 rounded-full" style="width:95%"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 px-5 py-3">
+                            <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 flex-shrink-0"><i class="fas fa-exclamation text-xs"></i></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-slate-900">Emergency Contact Form</p>
+                                <p class="text-xs text-slate-500">1,035 of 1,247 submitted</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs font-bold text-amber-600 mb-1">83%</div>
+                                <div class="w-24 bg-slate-200 rounded-full h-1.5"><div class="bg-amber-500 h-1.5 rounded-full" style="width:83%"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 px-5 py-3">
+                            <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 flex-shrink-0"><i class="fas fa-exclamation text-xs"></i></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-slate-900">Photo Release</p>
+                                <p class="text-xs text-slate-500">854 of 1,247 submitted</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs font-bold text-amber-600 mb-1">69%</div>
+                                <div class="w-24 bg-slate-200 rounded-full h-1.5"><div class="bg-amber-500 h-1.5 rounded-full" style="width:69%"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 px-5 py-3">
+                            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-600 flex-shrink-0"><i class="fas fa-times text-xs"></i></div>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-slate-900">Concussion Protocol Acknowledgment</p>
+                                <p class="text-xs text-slate-500">498 of 1,247 submitted</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs font-bold text-red-600 mb-1">40%</div>
+                                <div class="w-24 bg-slate-200 rounded-full h-1.5"><div class="bg-red-500 h-1.5 rounded-full" style="width:40%"></div></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="p-4 border-t border-slate-100">
+                        <button onclick="showToast('Sending reminders to 212 incomplete families...', 'success')" class="w-full py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl text-sm transition border border-amber-200">
+                            <i class="fas fa-paper-plane mr-2"></i> Send Reminders to Incomplete Families
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Staff Certifications -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-5 border-b border-slate-200">
+                        <h3 class="font-bold text-slate-900">Staff Certifications</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Coaches &amp; volunteers</p>
+                    </div>
+                    <div class="divide-y divide-slate-100">
+
+                        <div class="flex items-center gap-3 px-5 py-3">
+                            <img src="https://i.pravatar.cc/150?img=11" class="w-9 h-9 rounded-full flex-shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-900">Mike Chen <span class="text-slate-500 font-normal">· Head Coach</span></p>
+                                <div class="flex gap-2 mt-1 flex-wrap">
+                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">First Aid ✓</span>
+                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">CPR ✓</span>
+                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">Background ✓</span>
+                                </div>
+                            </div>
+                            <span class="text-xs text-green-600 font-bold flex-shrink-0">All Clear</span>
+                        </div>
+
+                        <div class="flex items-center gap-3 px-5 py-3">
+                            <img src="https://i.pravatar.cc/150?img=25" class="w-9 h-9 rounded-full flex-shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-900">Sarah Kim <span class="text-slate-500 font-normal">· Asst. Coach</span></p>
+                                <div class="flex gap-2 mt-1 flex-wrap">
+                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">First Aid ✓</span>
+                                    <span class="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-xs">CPR — expires Apr 2</span>
+                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">Background ✓</span>
+                                </div>
+                            </div>
+                            <span class="text-xs text-amber-600 font-bold flex-shrink-0">Expiring</span>
+                        </div>
+
+                        <div class="flex items-center gap-3 px-5 py-3">
+                            <img src="https://i.pravatar.cc/150?img=38" class="w-9 h-9 rounded-full flex-shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-900">James Rivera <span class="text-slate-500 font-normal">· Volunteer</span></p>
+                                <div class="flex gap-2 mt-1 flex-wrap">
+                                    <span class="px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs">First Aid — expired</span>
+                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">CPR ✓</span>
+                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">Background ✓</span>
+                                </div>
+                            </div>
+                            <span class="text-xs text-red-600 font-bold flex-shrink-0">Action Needed</span>
+                        </div>
+
+                        <div class="flex items-center gap-3 px-5 py-3">
+                            <img src="https://i.pravatar.cc/150?img=52" class="w-9 h-9 rounded-full flex-shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-slate-900">Lisa Park <span class="text-slate-500 font-normal">· Trainer</span></p>
+                                <div class="flex gap-2 mt-1 flex-wrap">
+                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">First Aid ✓</span>
+                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">CPR ✓</span>
+                                    <span class="px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs">Background — pending</span>
+                                </div>
+                            </div>
+                            <span class="text-xs text-red-600 font-bold flex-shrink-0">Pending</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Incident Log -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-900">Incident Log</h3>
+                    <button onclick="showToast('Opening incident report form...', 'info')" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-sm font-semibold transition border border-red-200">
+                        <i class="fas fa-plus mr-1"></i> Log Incident
+                    </button>
+                </div>
+                <div class="divide-y divide-slate-100 text-sm">
+                    <div class="flex items-center gap-4 px-5 py-4">
+                        <div class="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></div>
+                        <div class="flex-1">
+                            <p class="font-semibold text-slate-900">Minor ankle sprain — Jamal Wilson</p>
+                            <p class="text-xs text-slate-500">Feb 14, 2024 · Varsity Practice · Treated on-site, parents notified</p>
+                        </div>
+                        <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-xs font-bold">Minor</span>
+                    </div>
+                    <div class="flex items-center gap-4 px-5 py-4">
+                        <div class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></div>
+                        <div class="flex-1">
+                            <p class="font-semibold text-slate-900">Allergic reaction — Emma Thompson</p>
+                            <p class="text-xs text-slate-500">Feb 8, 2024 · Post-game snack · Epi-pen administered, ER visit, fully recovered</p>
+                        </div>
+                        <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-bold">Resolved</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <div id="module-reports" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Analytics</h2>
-            <p class="text-slate-600">Reports and analytics module</p>
+        <div id="module-reports" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900">Analytics &amp; Reports</h2>
+                    <p class="text-slate-600 mt-1">Spring 2024 season overview</p>
+                </div>
+                <div class="flex gap-2">
+                    <select class="px-4 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                        <option>Spring 2024</option>
+                        <option>Fall 2023</option>
+                        <option>Spring 2023</option>
+                    </select>
+                    <button onclick="showToast('Exporting report as PDF...', 'success')" class="px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition text-sm">
+                        <i class="fas fa-download mr-1"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Summary -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                    <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">Total Revenue</p>
+                    <p class="text-2xl font-bold text-slate-900">$84,240</p>
+                    <p class="text-xs text-green-600 font-semibold mt-1"><i class="fas fa-arrow-up mr-1"></i>8% vs last season</p>
+                </div>
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                    <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">Registrations</p>
+                    <p class="text-2xl font-bold text-slate-900">1,247</p>
+                    <p class="text-xs text-green-600 font-semibold mt-1"><i class="fas fa-arrow-up mr-1"></i>12% vs last season</p>
+                </div>
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                    <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">Retention Rate</p>
+                    <p class="text-2xl font-bold text-slate-900">73%</p>
+                    <p class="text-xs text-amber-600 font-semibold mt-1"><i class="fas fa-arrow-down mr-1"></i>2% vs last season</p>
+                </div>
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                    <p class="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">Avg Revenue/Player</p>
+                    <p class="text-2xl font-bold text-slate-900">$67.60</p>
+                    <p class="text-xs text-green-600 font-semibold mt-1"><i class="fas fa-arrow-up mr-1"></i>4% vs last season</p>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Revenue Over Time -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-900">Revenue Over Time</h3>
+                        <span class="text-xs text-slate-500">Last 6 months</span>
+                    </div>
+                    <canvas id="revenueChart" height="220"></canvas>
+                </div>
+
+                <!-- Registrations by Program -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-900">Registrations by Program</h3>
+                        <span class="text-xs text-slate-500">Spring 2024</span>
+                    </div>
+                    <canvas id="programChart" height="220"></canvas>
+                </div>
+            </div>
+
+            <!-- Second Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Attendance Rate -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 lg:col-span-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-900">Weekly Attendance Rate</h3>
+                        <span class="text-xs text-slate-500">% of players checked in</span>
+                    </div>
+                    <canvas id="attendanceChart" height="160"></canvas>
+                </div>
+
+                <!-- Payment Status Donut -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-900">Payment Status</h3>
+                    </div>
+                    <canvas id="paymentChart" height="200"></canvas>
+                    <div class="mt-4 space-y-2 text-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>Paid in Full</span>
+                            <span class="font-bold text-slate-900">68%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-brand-500 inline-block"></span>Payment Plan</span>
+                            <span class="font-bold text-slate-900">24%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-400 inline-block"></span>Outstanding</span>
+                            <span class="font-bold text-slate-900">8%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </main>
@@ -1187,6 +1615,59 @@
         </div>
     </div>
 
+    <!-- Announcement Composer Modal -->
+    <div id="announce-composer-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg modal-enter">
+            <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-slate-900">New Announcement</h3>
+                <button onclick="closeAnnounceComposer()" class="text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="text-sm font-semibold text-slate-700 block mb-1">Title <span class="text-red-500">*</span></label>
+                    <input type="text" placeholder="e.g. Practice cancelled this Thursday" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-slate-700 block mb-1">Message</label>
+                    <textarea rows="4" placeholder="Write your message here..." class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Send To</label>
+                        <select class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                            <option>All Parents &amp; Players</option>
+                            <option>All Parents</option>
+                            <option>Players Only</option>
+                            <option>Coaches Only</option>
+                            <option>Specific Program</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-slate-700 block mb-1">Send When</label>
+                        <select class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                            <option>Send Immediately</option>
+                            <option>Schedule for Later</option>
+                        </select>
+                    </div>
+                </div>
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" class="rounded text-brand-600">
+                    <span class="text-sm text-slate-700">Pin this announcement to the top</span>
+                </label>
+            </div>
+            <div class="px-6 pb-6 flex gap-3">
+                <button onclick="submitAnnouncement(false)" class="flex-1 py-2.5 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition text-sm">
+                    Save as Draft
+                </button>
+                <button onclick="submitAnnouncement(true)" class="flex-1 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-lg shadow-brand-500/30 transition text-sm flex items-center justify-center gap-2">
+                    <i class="fas fa-paper-plane"></i> Send Now
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notifications -->
     <div id="toast-container" class="fixed bottom-24 lg:bottom-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
@@ -1366,7 +1847,20 @@
         }
 
         function sendAnnouncement() {
-            showToast('Opening announcement composer...', 'info');
+            openAnnounceComposer();
+        }
+
+        function openAnnounceComposer() {
+            document.getElementById('announce-composer-modal').classList.remove('hidden');
+        }
+
+        function closeAnnounceComposer() {
+            document.getElementById('announce-composer-modal').classList.add('hidden');
+        }
+
+        function submitAnnouncement(send) {
+            closeAnnounceComposer();
+            showToast(send ? 'Announcement sent to all recipients!' : 'Announcement saved as draft.', send ? 'success' : 'info');
         }
 
         function checkInPlayers(eventId) {
@@ -1537,14 +2031,126 @@
                 document.getElementById('quick-actions-modal').classList.add('hidden');
                 document.getElementById('notifications-panel').classList.add('hidden');
                 document.getElementById('mobile-more-menu').classList.add('hidden');
+                document.getElementById('announce-composer-modal').classList.add('hidden');
+                closeRegistrationWizard();
             }
-            
+
             // / to focus search
             if (e.key === '/' && !e.target.matches('input')) {
                 e.preventDefault();
                 document.getElementById('global-search')?.focus();
             }
         });
+
+        // Analytics Charts — rendered when Analytics module is first shown
+        let chartsRendered = false;
+        function renderAnalyticsCharts() {
+            if (chartsRendered) return;
+            chartsRendered = true;
+
+            // Revenue Over Time
+            new Chart(document.getElementById('revenueChart'), {
+                type: 'line',
+                data: {
+                    labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'],
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: [9200, 11400, 8700, 7800, 14200, 18600],
+                        borderColor: '#0ea5e9',
+                        backgroundColor: 'rgba(14,165,233,0.1)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#0ea5e9',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'k' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Registrations by Program
+            new Chart(document.getElementById('programChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Soccer League', 'Basketball Camp', 'Volleyball Clinic', 'Flag Football', 'Multi-Sport'],
+                    datasets: [{
+                        label: 'Players',
+                        data: [84, 40, 28, 61, 35],
+                        backgroundColor: ['#0ea5e9','#8b5cf6','#f59e0b','#22c55e','#f43f5e'],
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Weekly Attendance
+            new Chart(document.getElementById('attendanceChart'), {
+                type: 'line',
+                data: {
+                    labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'],
+                    datasets: [{
+                        label: 'Attendance %',
+                        data: [88, 91, 87, 93, 89, 95, 92, 90],
+                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(34,197,94,0.1)',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#22c55e',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { min: 70, max: 100, grid: { color: '#f1f5f9' }, ticks: { callback: v => v + '%' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Payment Donut
+            new Chart(document.getElementById('paymentChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Paid in Full', 'Payment Plan', 'Outstanding'],
+                    datasets: [{
+                        data: [68, 24, 8],
+                        backgroundColor: ['#22c55e', '#0ea5e9', '#f87171'],
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '72%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // Hook chart rendering to module switch
+        const _origSwitch = switchModule;
+        switchModule = function(name) {
+            _origSwitch(name);
+            if (name === 'reports') renderAnalyticsCharts();
+        };
     </script>
 </body>
 </html>
