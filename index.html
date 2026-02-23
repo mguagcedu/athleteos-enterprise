@@ -73,6 +73,43 @@
         
         .modal-enter { animation: modalFade 0.3s ease-out; }
         @keyframes modalFade { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* Step Progress */
+        .step-connector {
+            position: absolute;
+            left: 15px;
+            top: 36px;
+            bottom: -12px;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        .step-connector.done { background: #22c55e; }
+        .step-connector.active { background: linear-gradient(to bottom, #0ea5e9 50%, #e2e8f0 50%); }
+
+        .progress-bar-animated {
+            background: linear-gradient(90deg, #0ea5e9 0%, #38bdf8 50%, #0ea5e9 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* Wizard step indicator */
+        .wizard-step-dot {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+            border: 2px solid #e2e8f0;
+            background: white; color: #94a3b8;
+            flex-shrink: 0; position: relative; z-index: 1;
+            transition: all 0.3s;
+        }
+        .wizard-step-dot.done { background: #22c55e; border-color: #22c55e; color: white; }
+        .wizard-step-dot.active { background: #0ea5e9; border-color: #0ea5e9; color: white; box-shadow: 0 0 0 4px rgba(14,165,233,0.2); }
+        .wizard-step-line {
+            flex: 1; height: 2px; background: #e2e8f0; transition: background 0.3s;
+        }
+        .wizard-step-line.done { background: #22c55e; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden">
@@ -555,6 +592,102 @@
                         </div>
                     </div>
 
+                    <!-- Season Setup Progress -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="font-bold text-slate-900">Season Setup</h3>
+                            <span class="text-xs font-bold text-brand-600" id="season-progress-label">3 of 5 done</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+                            <span>Overall Progress</span>
+                            <span id="season-progress-pct">60%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2.5 mb-5 overflow-hidden">
+                            <div id="season-progress-bar" class="bg-brand-500 h-2.5 rounded-full transition-all duration-700" style="width: 60%"></div>
+                        </div>
+
+                        <div class="space-y-1" id="season-steps">
+
+                            <!-- Step 1: Completed -->
+                            <div class="step-item relative flex items-start gap-3 pb-4">
+                                <div class="step-connector done"></div>
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0 font-bold text-xs z-10">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="flex-1 pt-0.5">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-semibold text-slate-900">Configure Season Settings</p>
+                                        <span class="text-xs text-green-600 font-bold">Done</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">Spring 2024 profile configured</p>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Completed -->
+                            <div class="step-item relative flex items-start gap-3 pb-4">
+                                <div class="step-connector done"></div>
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0 font-bold text-xs z-10">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="flex-1 pt-0.5">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-semibold text-slate-900">Create Programs</p>
+                                        <span class="text-xs text-green-600 font-bold">Done</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500">3 active programs created</p>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: In Progress -->
+                            <div class="step-item relative flex items-start gap-3 pb-4">
+                                <div class="step-connector active"></div>
+                                <div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 flex-shrink-0 font-bold text-xs z-10 ring-4 ring-brand-100">
+                                    3
+                                </div>
+                                <div class="flex-1 pt-0.5">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-semibold text-slate-900">Open Registrations</p>
+                                        <span class="text-xs text-brand-600 font-bold">84%</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mb-1.5">84 of 100 spots filled</p>
+                                    <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                                        <div class="progress-bar-animated h-1.5 rounded-full" style="width: 84%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 4: Pending -->
+                            <div class="step-item relative flex items-start gap-3 pb-4">
+                                <div class="step-connector"></div>
+                                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 flex-shrink-0 font-bold text-xs z-10">
+                                    4
+                                </div>
+                                <div class="flex-1 pt-0.5">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-semibold text-slate-500">Assign Coaches & Staff</p>
+                                        <span class="text-xs text-slate-400 font-semibold">Pending</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400">3 roles still unassigned</p>
+                                </div>
+                            </div>
+
+                            <!-- Step 5: Pending (last — no connector) -->
+                            <div class="step-item relative flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 flex-shrink-0 font-bold text-xs z-10">
+                                    5
+                                </div>
+                                <div class="flex-1 pt-0.5">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-semibold text-slate-500">Publish Schedule</p>
+                                        <span class="text-xs text-slate-400 font-semibold">Pending</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400">Share with parents & players</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
                     <!-- Upcoming Birthdays -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                         <h3 class="font-bold text-slate-900 mb-4">Team Birthdays</h3>
@@ -838,6 +971,222 @@
 
     </main>
 
+    <!-- Registration Wizard Modal -->
+    <div id="registration-wizard-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg modal-enter">
+
+            <!-- Wizard Header -->
+            <div class="p-6 border-b border-slate-200">
+                <div class="flex justify-between items-center mb-5">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">New Program</h3>
+                        <p class="text-sm text-slate-500 mt-0.5" id="wizard-step-subtitle">Step <span id="wizard-current-num">1</span> of 4</p>
+                    </div>
+                    <button onclick="closeRegistrationWizard()" class="text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Step indicators -->
+                <div class="flex items-center" id="wizard-step-indicators">
+                    <div class="wizard-step-dot active" id="wdot-1">1</div>
+                    <div class="wizard-step-line" id="wline-1"></div>
+                    <div class="wizard-step-dot" id="wdot-2">2</div>
+                    <div class="wizard-step-line" id="wline-2"></div>
+                    <div class="wizard-step-dot" id="wdot-3">3</div>
+                    <div class="wizard-step-line" id="wline-3"></div>
+                    <div class="wizard-step-dot" id="wdot-4">4</div>
+                </div>
+
+                <!-- Step labels -->
+                <div class="flex items-center mt-2 text-xs text-slate-500">
+                    <span class="w-8 text-center font-semibold text-brand-600" id="wlabel-1">Details</span>
+                    <div class="flex-1"></div>
+                    <span class="w-8 text-center" id="wlabel-2">Schedule</span>
+                    <div class="flex-1"></div>
+                    <span class="w-8 text-center" id="wlabel-3">Pricing</span>
+                    <div class="flex-1"></div>
+                    <span class="w-8 text-center" id="wlabel-4">Review</span>
+                </div>
+
+                <!-- Overall progress bar -->
+                <div class="mt-3">
+                    <div class="flex justify-between text-xs text-slate-500 mb-1">
+                        <span>Progress</span>
+                        <span id="wizard-pct">25%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                        <div id="wizard-progress-bar" class="bg-brand-500 h-1.5 rounded-full transition-all duration-500" style="width: 25%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step Content -->
+            <div class="p-6">
+
+                <!-- Step 1: Program Details -->
+                <div id="wizard-step-1">
+                    <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                        Program Details
+                    </h4>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm font-semibold text-slate-700 block mb-1">Program Name <span class="text-red-500">*</span></label>
+                            <input type="text" placeholder="e.g. Summer Soccer Camp 2024" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm font-semibold text-slate-700 block mb-1">Sport / Type</label>
+                                <select class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                                    <option>Soccer</option>
+                                    <option>Basketball</option>
+                                    <option>Baseball</option>
+                                    <option>Volleyball</option>
+                                    <option>Multi-Sport</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold text-slate-700 block mb-1">Age Group</label>
+                                <select class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                                    <option>U8 (6-8)</option>
+                                    <option>U10 (8-10)</option>
+                                    <option>U12 (10-12)</option>
+                                    <option>U14 (12-14)</option>
+                                    <option>U16 (14-16)</option>
+                                    <option>U18 (16-18)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold text-slate-700 block mb-1">Max Capacity</label>
+                            <input type="number" placeholder="e.g. 50" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Schedule & Location -->
+                <div id="wizard-step-2" class="hidden">
+                    <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                        Schedule &amp; Location
+                    </h4>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm font-semibold text-slate-700 block mb-1">Start Date</label>
+                                <input type="date" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold text-slate-700 block mb-1">End Date</label>
+                                <input type="date" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold text-slate-700 block mb-1">Facility / Location</label>
+                            <select class="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-brand-500">
+                                <option>Central Fields</option>
+                                <option>Sports Complex</option>
+                                <option>Community Gym</option>
+                                <option>North Park</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold text-slate-700 block mb-1">Practice Days</label>
+                            <div class="flex gap-2 flex-wrap">
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="rounded"> <span class="text-sm text-slate-700">Mon</span></label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="rounded"> <span class="text-sm text-slate-700">Tue</span></label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="rounded"> <span class="text-sm text-slate-700">Wed</span></label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="rounded"> <span class="text-sm text-slate-700">Thu</span></label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="rounded"> <span class="text-sm text-slate-700">Fri</span></label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="rounded"> <span class="text-sm text-slate-700">Sat</span></label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="checkbox" class="rounded"> <span class="text-sm text-slate-700">Sun</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Pricing -->
+                <div id="wizard-step-3" class="hidden">
+                    <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                        Pricing
+                    </h4>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm font-semibold text-slate-700 block mb-1">Registration Fee</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3 text-slate-500">$</span>
+                                <input type="number" placeholder="250" class="w-full pl-8 pr-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold text-slate-700 block mb-2">Payment Options</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition">
+                                    <input type="radio" name="payment-opt" checked class="text-brand-600">
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-900">Full Payment</p>
+                                        <p class="text-xs text-slate-500">One-time upfront payment</p>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition">
+                                    <input type="radio" name="payment-opt" class="text-brand-600">
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-900">Installment Plan</p>
+                                        <p class="text-xs text-slate-500">Split into 2-3 payments</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" class="rounded text-brand-600">
+                                <span class="text-sm text-slate-700">Enable scholarship / financial aid applications</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Review -->
+                <div id="wizard-step-4" class="hidden">
+                    <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                        Review &amp; Publish
+                    </h4>
+                    <div class="bg-slate-50 rounded-xl p-4 space-y-3 text-sm mb-4">
+                        <div class="flex items-center gap-2 text-green-700 font-semibold">
+                            <i class="fas fa-check-circle"></i> Program Details configured
+                        </div>
+                        <div class="flex items-center gap-2 text-green-700 font-semibold">
+                            <i class="fas fa-check-circle"></i> Schedule &amp; Location set
+                        </div>
+                        <div class="flex items-center gap-2 text-green-700 font-semibold">
+                            <i class="fas fa-check-circle"></i> Pricing &amp; Payment options ready
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3">Publishing will make this program visible to families and open registration immediately.</p>
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" class="rounded text-brand-600">
+                        <span class="text-sm text-slate-700">Notify existing families via email when published</span>
+                    </label>
+                </div>
+
+            </div>
+
+            <!-- Wizard Footer -->
+            <div class="px-6 pb-6 flex items-center justify-between border-t border-slate-200 pt-4">
+                <button id="wizard-back-btn" onclick="wizardPrev()" class="px-5 py-2.5 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition hidden">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </button>
+                <div class="flex-1"></div>
+                <button id="wizard-next-btn" onclick="wizardNext()" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold shadow-lg shadow-brand-500/30 transition flex items-center gap-2">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notifications -->
     <div id="toast-container" class="fixed bottom-24 lg:bottom-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
@@ -1032,8 +1381,98 @@
             showToast(`Offering spot to: ${playerId}`, 'success');
         }
 
+        // Registration Wizard
+        const WizardState = { currentStep: 1, totalSteps: 4 };
+
         function openRegistrationWizard() {
-            showToast('Launching registration wizard...', 'info');
+            WizardState.currentStep = 1;
+            updateWizardUI();
+            document.getElementById('registration-wizard-modal').classList.remove('hidden');
+        }
+
+        function closeRegistrationWizard() {
+            document.getElementById('registration-wizard-modal').classList.add('hidden');
+            WizardState.currentStep = 1;
+        }
+
+        function wizardNext() {
+            if (WizardState.currentStep < WizardState.totalSteps) {
+                WizardState.currentStep++;
+                updateWizardUI();
+            } else {
+                // Final step: publish
+                closeRegistrationWizard();
+                showToast('Program created and published successfully!', 'success');
+            }
+        }
+
+        function wizardPrev() {
+            if (WizardState.currentStep > 1) {
+                WizardState.currentStep--;
+                updateWizardUI();
+            }
+        }
+
+        function updateWizardUI() {
+            const step = WizardState.currentStep;
+            const total = WizardState.totalSteps;
+            const pct = Math.round((step / total) * 100);
+
+            // Progress bar
+            document.getElementById('wizard-progress-bar').style.width = pct + '%';
+            document.getElementById('wizard-pct').textContent = pct + '%';
+
+            // Step counter subtitle
+            document.getElementById('wizard-current-num').textContent = step;
+
+            // Show/hide step panels
+            for (let i = 1; i <= total; i++) {
+                const panel = document.getElementById('wizard-step-' + i);
+                if (panel) panel.classList.toggle('hidden', i !== step);
+
+                // Step dots
+                const dot = document.getElementById('wdot-' + i);
+                const label = document.getElementById('wlabel-' + i);
+                if (dot) {
+                    dot.classList.remove('done', 'active');
+                    if (i < step) {
+                        dot.classList.add('done');
+                        dot.innerHTML = '<i class="fas fa-check text-xs"></i>';
+                    } else if (i === step) {
+                        dot.classList.add('active');
+                        dot.textContent = i;
+                    } else {
+                        dot.textContent = i;
+                    }
+                }
+                if (label) {
+                    label.classList.toggle('text-brand-600', i === step);
+                    label.classList.toggle('font-semibold', i === step);
+                    label.classList.toggle('text-green-600', i < step);
+                }
+
+                // Connector lines
+                if (i < total) {
+                    const line = document.getElementById('wline-' + i);
+                    if (line) line.classList.toggle('done', i < step);
+                }
+            }
+
+            // Back button
+            const backBtn = document.getElementById('wizard-back-btn');
+            backBtn.classList.toggle('hidden', step === 1);
+
+            // Next/Publish button
+            const nextBtn = document.getElementById('wizard-next-btn');
+            if (step === total) {
+                nextBtn.innerHTML = '<i class="fas fa-rocket mr-2"></i> Publish Program';
+                nextBtn.classList.remove('bg-brand-600', 'hover:bg-brand-700', 'shadow-brand-500/30');
+                nextBtn.classList.add('bg-green-600', 'hover:bg-green-700', 'shadow-green-500/30');
+            } else {
+                nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+                nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'shadow-green-500/30');
+                nextBtn.classList.add('bg-brand-600', 'hover:bg-brand-700', 'shadow-brand-500/30');
+            }
         }
 
         function sendPaymentReminders() {
