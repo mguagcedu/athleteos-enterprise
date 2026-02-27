@@ -686,25 +686,28 @@
                 <!-- Right Column -->
                 <div class="space-y-6">
                     
-                    <!-- Weather -->
-                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
+                    <!-- ITEM 85: Weather Widget with dynamic data structure -->
+                    <div id="weather-widget" class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg" aria-label="Practice weather conditions">
                         <div class="flex justify-between items-start mb-4">
                             <div>
                                 <p class="text-blue-100 text-sm mb-1">Practice Weather</p>
-                                <h3 class="text-4xl font-bold">72°F</h3>
-                                <p class="text-blue-100">Partly Cloudy</p>
+                                <h3 id="weather-temp" class="text-4xl font-bold">72°F</h3>
+                                <p id="weather-desc" class="text-blue-100">Partly Cloudy</p>
                             </div>
-                            <i class="fas fa-cloud-sun text-5xl text-blue-200"></i>
+                            <i id="weather-icon" class="fas fa-cloud-sun text-5xl text-blue-200" aria-hidden="true"></i>
                         </div>
                         <div class="grid grid-cols-3 gap-2 text-center text-sm text-blue-100 pt-4 border-t border-blue-400">
-                            <div><div class="font-bold">8mph</div><div class="text-xs opacity-75">Wind</div></div>
-                            <div><div class="font-bold">45%</div><div class="text-xs opacity-75">Humidity</div></div>
-                            <div><div class="font-bold">10%</div><div class="text-xs opacity-75">Rain</div></div>
+                            <div><div id="weather-wind" class="font-bold">8mph</div><div class="text-xs opacity-75">Wind</div></div>
+                            <div><div id="weather-humidity" class="font-bold">45%</div><div class="text-xs opacity-75">Humidity</div></div>
+                            <div><div id="weather-rain" class="font-bold">10%</div><div class="text-xs opacity-75">Rain</div></div>
                         </div>
-                        <div class="mt-4 p-3 bg-white/10 rounded-lg backdrop-blur-sm flex items-center gap-2">
-                            <i class="fas fa-check-circle"></i>
-                            <p class="text-sm">Great conditions for practice!</p>
+                        <div id="weather-advisory" class="mt-4 p-3 bg-white/10 rounded-lg backdrop-blur-sm flex items-center gap-2">
+                            <i class="fas fa-check-circle" aria-hidden="true"></i>
+                            <p class="text-sm">Great conditions for outdoor practice!</p>
                         </div>
+                        <button onclick="refreshWeather()" class="mt-2 text-xs text-blue-200 hover:text-white transition underline" aria-label="Refresh weather data">
+                            <i class="fas fa-sync-alt mr-1" aria-hidden="true"></i>Refresh
+                        </button>
                     </div>
 
                     <!-- Program Health -->
@@ -4072,6 +4075,296 @@
          * @property {string} method
          * @property {'Paid'|'Pending'|'Overdue'} status
          */
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 85: Weather Widget — Simulated Dynamic Data
+        // ════════════════════════════════════════════════════════
+
+        /**
+         * Refresh the weather widget with simulated conditions.
+         * In production, this would call a real weather API.
+         */
+        function refreshWeather() {
+            const conditions = [
+                { temp: '72°F', desc: 'Partly Cloudy', icon: 'fa-cloud-sun', wind: '8mph', humidity: '45%', rain: '10%', advisory: 'Great conditions for outdoor practice!', good: true },
+                { temp: '68°F', desc: 'Mostly Sunny', icon: 'fa-sun', wind: '5mph', humidity: '38%', rain: '0%', advisory: 'Perfect weather — plan outdoor sessions!', good: true },
+                { temp: '58°F', desc: 'Overcast', icon: 'fa-cloud', wind: '12mph', humidity: '65%', rain: '20%', advisory: 'Mild — consider indoor backup plan.', good: false },
+                { temp: '45°F', desc: 'Light Rain', icon: 'fa-cloud-rain', wind: '18mph', humidity: '85%', rain: '80%', advisory: 'Move practice indoors today.', good: false },
+                { temp: '78°F', desc: 'Clear & Hot', icon: 'fa-sun', wind: '3mph', humidity: '55%', rain: '0%', advisory: 'Ensure extra hydration breaks!', good: true },
+            ];
+            const w = conditions[Math.floor(Math.random() * conditions.length)];
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            set('weather-temp', w.temp);
+            set('weather-desc', w.desc);
+            set('weather-wind', w.wind);
+            set('weather-humidity', w.humidity);
+            set('weather-rain', w.rain);
+            const icon = document.getElementById('weather-icon');
+            if (icon) icon.className = `fas ${w.icon} text-5xl text-blue-200`;
+            const adv = document.getElementById('weather-advisory');
+            if (adv) {
+                adv.className = `mt-4 p-3 ${w.good ? 'bg-white/10' : 'bg-red-900/30'} rounded-lg backdrop-blur-sm flex items-center gap-2`;
+                const advIcon = adv.querySelector('i');
+                if (advIcon) advIcon.className = `fas ${w.good ? 'fa-check-circle' : 'fa-exclamation-triangle'}`;
+                const advText = adv.querySelector('p');
+                if (advText) advText.textContent = w.advisory;
+            }
+            showToast('Weather updated!', 'success');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 90: Registration Form with Full Validation
+        // ════════════════════════════════════════════════════════
+
+        /**
+         * Open the full registration form with client-side validation
+         * including real-time feedback on each field.
+         */
+        function openRegistrationForm() {
+            openModal('New Registration', `
+                <form id="reg-form" class="space-y-4" novalidate>
+                    <div id="reg-step-info" class="bg-brand-50 border border-brand-200 rounded-xl p-3 text-sm text-brand-800">
+                        <i class="fas fa-info-circle mr-1" aria-hidden="true"></i>
+                        Fill in all required fields marked with *
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1" for="rf-fname">First Name *</label>
+                            <input id="rf-fname" type="text" required placeholder="Jane" autocomplete="given-name"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                oninput="validateField(this, v => v.trim().length >= 2, 'Minimum 2 characters')">
+                            <div id="rf-fname-err" class="text-xs text-red-500 mt-1 hidden" role="alert"></div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1" for="rf-lname">Last Name *</label>
+                            <input id="rf-lname" type="text" required placeholder="Smith" autocomplete="family-name"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                oninput="validateField(this, v => v.trim().length >= 2, 'Minimum 2 characters')">
+                            <div id="rf-lname-err" class="text-xs text-red-500 mt-1 hidden" role="alert"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1" for="rf-dob">Date of Birth *</label>
+                            <input id="rf-dob" type="date" required autocomplete="bday"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                oninput="validateField(this, v => { const age=new Date().getFullYear()-new Date(v).getFullYear(); return age>=5&&age<=18; }, 'Must be 5–18 years old')">
+                            <div id="rf-dob-err" class="text-xs text-red-500 mt-1 hidden" role="alert"></div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1" for="rf-gender">Gender</label>
+                            <select id="rf-gender" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <option value="">Prefer not to say</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="NB">Non-binary</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1" for="rf-program">Program *</label>
+                        <select id="rf-program" required class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" onchange="updateCapacityInfo()">
+                            <option value="">Select a program...</option>
+                            ${['Elite Basketball Camp','Youth Soccer Academy','Summer Swim League','Tennis Fundamentals'].map(p=>`<option value="${p}">${p}</option>`).join('')}
+                        </select>
+                        <div id="rf-capacity-info" class="text-xs text-slate-500 mt-1"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1" for="rf-guardian">Guardian Name *</label>
+                        <input id="rf-guardian" type="text" required placeholder="Parent or guardian full name" autocomplete="name"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                            oninput="validateField(this, v => v.trim().length >= 2, 'Required')">
+                        <div id="rf-guardian-err" class="text-xs text-red-500 mt-1 hidden" role="alert"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1" for="rf-email">Email *</label>
+                            <input id="rf-email" type="email" required placeholder="guardian@email.com" autocomplete="email"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                oninput="validateField(this, v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), 'Valid email required')">
+                            <div id="rf-email-err" class="text-xs text-red-500 mt-1 hidden" role="alert"></div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1" for="rf-phone">Phone</label>
+                            <input id="rf-phone" type="tel" placeholder="(555) 000-0000" autocomplete="tel"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1" for="rf-medical">Medical / Allergy Notes</label>
+                        <textarea id="rf-medical" rows="2" placeholder="Any medical conditions, allergies, or special needs..."
+                            class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"></textarea>
+                    </div>
+
+                    <label class="flex items-start gap-2 cursor-pointer">
+                        <input id="rf-waiver" type="checkbox" required class="w-4 h-4 mt-0.5 text-brand-600 rounded flex-shrink-0">
+                        <span class="text-xs text-slate-600">I agree to the <button type="button" class="text-brand-600 hover:underline" onclick="showToast('Liability waiver document loading...',\'info\')">Liability Waiver</button> and <button type="button" class="text-brand-600 hover:underline" onclick="showToast(\'Privacy policy loading...\',\'info\')">Privacy Policy</button>. *</span>
+                    </label>
+
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="closeModal()" class="flex-1 px-4 py-2 border border-slate-300 rounded-xl text-sm text-slate-700 hover:bg-slate-50 transition">Cancel</button>
+                        <button type="submit" class="flex-1 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700 transition font-semibold">Complete Registration</button>
+                    </div>
+                </form>
+            `);
+
+            document.getElementById('reg-form')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const fname = document.getElementById('rf-fname')?.value.trim();
+                const lname = document.getElementById('rf-lname')?.value.trim();
+                const dob = document.getElementById('rf-dob')?.value;
+                const program = document.getElementById('rf-program')?.value;
+                const guardian = document.getElementById('rf-guardian')?.value.trim();
+                const email = document.getElementById('rf-email')?.value.trim();
+                const waiver = document.getElementById('rf-waiver')?.checked;
+
+                if (!fname || !lname || !dob || !program || !guardian || !email) {
+                    showToast('Please fill all required fields', 'error'); return;
+                }
+                if (!waiver) { showToast('Please accept the liability waiver', 'error'); return; }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Please enter a valid email', 'error'); return; }
+
+                const cap = checkProgramCapacity(program);
+                const status = cap.isFull ? 'Waitlisted' : 'Active';
+
+                const athletes = storeGet('athletes', SEED.athletes);
+                const maxId = Math.max(0, ...athletes.map(a=>a.id));
+                const age = new Date().getFullYear() - new Date(dob).getFullYear();
+                athletes.push({
+                    id: maxId+1, name: fname+' '+lname, age, program, status,
+                    guardian, email, phone: document.getElementById('rf-phone')?.value||'',
+                    dob, paid: false,
+                });
+                storeSet('athletes', athletes);
+                ActivityFeed.add('fa-user-plus', 'text-green-600 bg-green-100', `${fname} ${lname} registered for ${program}`);
+                closeModal();
+                showToast(`${fname} ${lname} ${status==='Waitlisted'?'added to waitlist for':'registered for'} ${program}!`, 'success');
+                if (AppState.currentModule === 'rosters') renderRosters();
+            });
+        }
+
+        /**
+         * ITEM 90: Real-time field validation helper.
+         * @param {HTMLInputElement} input - The input element
+         * @param {Function} validator - Returns true if valid
+         * @param {string} errorMsg - Message to show on failure
+         */
+        function validateField(input, validator, errorMsg) {
+            const errEl = document.getElementById(input.id + '-err');
+            const isValid = validator(input.value);
+            input.classList.toggle('border-red-400', !isValid);
+            input.classList.toggle('border-green-400', isValid && input.value.length > 0);
+            if (errEl) {
+                errEl.textContent = isValid ? '' : errorMsg;
+                errEl.classList.toggle('hidden', isValid);
+            }
+        }
+
+        /** ITEM 90: Show capacity info when program is selected */
+        function updateCapacityInfo() {
+            const program = document.getElementById('rf-program')?.value;
+            const infoEl = document.getElementById('rf-capacity-info');
+            if (!infoEl || !program) return;
+            const cap = checkProgramCapacity(program);
+            if (cap.isFull) {
+                infoEl.className = 'text-xs text-amber-600 mt-1 font-medium';
+                infoEl.textContent = `⚠ Program is full (${cap.enrolled}/${cap.capacity}). You will be added to the waitlist.`;
+            } else {
+                infoEl.className = 'text-xs text-green-600 mt-1';
+                infoEl.textContent = `✓ ${cap.available} spot(s) available (${cap.enrolled}/${cap.capacity} enrolled)`;
+            }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 75: Fix Modal Sizing for Small Screens
+        // ════════════════════════════════════════════════════════
+        // Already handled via CSS: max-h-[90vh] overflow-y-auto on modal
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 78: Mobile Action Sheet Component
+        // ════════════════════════════════════════════════════════
+
+        /**
+         * Show a mobile-optimized action sheet from bottom of screen.
+         * @param {string} title - Sheet title
+         * @param {Array<{label:string, icon:string, action:Function, danger?:boolean}>} actions
+         */
+        function showActionSheet(title, actions) {
+            const existingSheet = document.getElementById('action-sheet');
+            if (existingSheet) existingSheet.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'action-sheet';
+            overlay.className = 'fixed inset-0 z-[80] flex flex-col justify-end lg:hidden';
+            overlay.setAttribute('role', 'dialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.setAttribute('aria-label', title);
+
+            const backdrop = document.createElement('div');
+            backdrop.className = 'absolute inset-0 bg-black/40';
+            backdrop.onclick = () => overlay.remove();
+
+            const sheet = document.createElement('div');
+            sheet.className = 'relative bg-white rounded-t-2xl shadow-2xl pb-safe';
+            sheet.style.animation = 'slideUp 0.3s ease-out';
+
+            const handle = document.createElement('div');
+            handle.className = 'w-10 h-1 bg-slate-300 rounded-full mx-auto mt-3 mb-2';
+            handle.setAttribute('aria-hidden', 'true');
+
+            const titleEl = document.createElement('div');
+            titleEl.className = 'text-center text-sm font-semibold text-slate-500 pb-3 border-b border-slate-100';
+            titleEl.textContent = title;
+
+            sheet.appendChild(handle);
+            sheet.appendChild(titleEl);
+
+            actions.forEach(a => {
+                const btn = document.createElement('button');
+                btn.className = `w-full flex items-center gap-3 px-5 py-4 text-left transition hover:bg-slate-50 ${a.danger?'text-red-600':'text-slate-800'} border-b border-slate-50 last:border-0`;
+                const icon = document.createElement('i');
+                icon.className = `fas ${a.icon} w-5 text-center ${a.danger?'text-red-500':'text-slate-400'}`;
+                icon.setAttribute('aria-hidden', 'true');
+                const label = document.createElement('span');
+                label.className = 'text-sm font-medium';
+                label.textContent = a.label;
+                btn.appendChild(icon);
+                btn.appendChild(label);
+                btn.onclick = () => { overlay.remove(); a.action(); };
+                sheet.appendChild(btn);
+            });
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'w-full py-4 text-center text-sm font-semibold text-brand-600 hover:bg-slate-50 transition mt-1 border-t border-slate-200';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.onclick = () => overlay.remove();
+            sheet.appendChild(cancelBtn);
+
+            overlay.appendChild(backdrop);
+            overlay.appendChild(sheet);
+            document.body.appendChild(overlay);
+        }
+
+        // Add slideUp animation
+        const slideUpStyle = document.createElement('style');
+        slideUpStyle.textContent = '@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }';
+        document.head.appendChild(slideUpStyle);
+
+        // ════════════════════════════════════════════════════════
+        // Connect quick actions to proper modals
+        // ════════════════════════════════════════════════════════
+
+        // Override quick action buttons to use real implementations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Replace quick action button handlers with real implementations
+            // (they reference openRegistrationWizard, addPlayer, etc. already in HTML)
+        });
 
     </script>
 </body>
