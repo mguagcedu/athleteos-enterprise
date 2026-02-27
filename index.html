@@ -4,13 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AthleteOS Enterprise 2.0 - Complete Sports Management</title>
-    
-    <!-- External Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ITEM 2: Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+        style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+        img-src 'self' data: https://i.pravatar.cc https://ui-avatars.com;
+        connect-src 'self';
+    ">
+
+    <!-- ITEM 79: Resource Hints for performance -->
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- ITEM 3: External Libraries with crossorigin for SRI-readiness -->
+    <!-- NOTE: In production, add integrity="sha384-..." attributes after verifying hashes -->
+    <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
     
     <script>
         tailwind.config = {
@@ -946,61 +966,148 @@
             window.scrollTo(0, 0);
         }
 
+        // ITEM 5: All DOM lookups now null-safe with optional chaining / guard clauses
+
         // Mobile Menu Toggle
         function toggleMobileMore() {
             const menu = document.getElementById('mobile-more-menu');
-            menu.classList.toggle('hidden');
+            if (menu) menu.classList.toggle('hidden');
         }
 
         // Notifications Toggle
         function toggleNotifications() {
             const panel = document.getElementById('notifications-panel');
-            panel.classList.toggle('hidden');
+            if (!panel) return;
+            const isHidden = panel.classList.toggle('hidden');
+            // ITEM 39: Update aria-expanded on trigger button
+            const bellBtn = document.getElementById('notifications-btn');
+            if (bellBtn) bellBtn.setAttribute('aria-expanded', String(!isHidden));
+            // Close quick actions if open
+            document.getElementById('quick-actions-modal')?.classList.add('hidden');
         }
 
         // Quick Actions Toggle
         function toggleQuickActions() {
             const modal = document.getElementById('quick-actions-modal');
-            modal.classList.toggle('hidden');
+            if (!modal) return;
+            const isHidden = modal.classList.toggle('hidden');
+            // ITEM 39: Update aria-expanded
+            const qaBtn = document.getElementById('quick-actions-btn');
+            if (qaBtn) qaBtn.setAttribute('aria-expanded', String(!isHidden));
+            // Close notifications if open
+            document.getElementById('notifications-panel')?.classList.add('hidden');
+            if (!isHidden) trapFocus(modal);
         }
 
-        // Sidebar Toggle (Mobile)
-        function toggleSidebar() {
-            // For mobile sidebar implementation
-            showToast('Sidebar toggle - mobile view');
+        // ITEM 38: Keyboard trap for modals
+        function trapFocus(element) {
+            const focusable = element.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            element.addEventListener('keydown', function trapHandler(e) {
+                if (e.key !== 'Tab') return;
+                if (e.shiftKey) {
+                    if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+                } else {
+                    if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+                }
+                if (e.key === 'Escape') { element.classList.add('hidden'); element.removeEventListener('keydown', trapHandler); }
+            });
+            first.focus();
         }
 
         // User Menu
         function showUserMenu() {
-            showToast('User menu: Profile, Settings, Logout');
+            const userMenuModal = document.getElementById('user-menu-modal');
+            if (userMenuModal) {
+                userMenuModal.classList.toggle('hidden');
+                trapFocus(userMenuModal);
+            } else {
+                showToast('User menu: Profile, Settings, Logout');
+            }
         }
 
-        // Toast Notifications
+        /**
+         * ITEM 4: Input sanitization utility — strips HTML tags from user input.
+         * @param {string} str - Raw user input
+         * @returns {string} Sanitized plain text
+         */
+        function sanitizeInput(str) {
+            if (typeof str !== 'string') return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML; // entities encoded, safe to set as innerHTML if needed
+        }
+
+        /**
+         * ITEM 1 (XSS Fix): Build toast using createElement + textContent — no innerHTML with user data.
+         * ITEM 36: Announces to screen readers via aria-live region.
+         * @param {string} message - Toast message (user-visible text)
+         * @param {'info'|'success'|'warning'|'error'} type - Toast type
+         */
         function showToast(message, type = 'info') {
+            // ITEM 5: Null-safe container lookup
             const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
+            if (!container) return;
+
             const colors = {
                 info: 'bg-slate-900',
                 success: 'bg-green-600',
                 warning: 'bg-amber-600',
                 error: 'bg-red-600'
             };
-            
-            toast.className = `notification-toast ${colors[type]} text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 pointer-events-auto min-w-[300px]`;
-            toast.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'error' ? 'times-circle' : 'info-circle'}"></i>
-                <span class="font-medium">${message}</span>
-            `;
-            
+            const icons = {
+                info: 'fa-info-circle',
+                success: 'fa-check-circle',
+                warning: 'fa-exclamation-triangle',
+                error: 'fa-times-circle'
+            };
+
+            // ITEM 1 (XSS Fix): Use createElement + textContent instead of innerHTML
+            const toast = document.createElement('div');
+            toast.className = `notification-toast ${colors[type] || 'bg-slate-900'} text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 pointer-events-auto min-w-[300px]`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+
+            const icon = document.createElement('i');
+            icon.className = `fas ${icons[type] || icons.info}`;
+            icon.setAttribute('aria-hidden', 'true');
+
+            const text = document.createElement('span');
+            text.className = 'font-medium';
+            text.textContent = message; // safe: textContent, not innerHTML
+
+            // Close button
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'ml-auto text-white/70 hover:text-white transition';
+            closeBtn.setAttribute('aria-label', 'Dismiss notification');
+            const closeIcon = document.createElement('i');
+            closeIcon.className = 'fas fa-times text-xs';
+            closeIcon.setAttribute('aria-hidden', 'true');
+            closeBtn.appendChild(closeIcon);
+            closeBtn.addEventListener('click', () => dismissToast(toast));
+
+            toast.appendChild(icon);
+            toast.appendChild(text);
+            toast.appendChild(closeBtn);
             container.appendChild(toast);
-            
-            setTimeout(() => {
+
+            // ITEM 81: Use requestAnimationFrame for smooth animation
+            const autoRemove = setTimeout(() => dismissToast(toast), 4000);
+            toast._autoRemove = autoRemove;
+        }
+
+        /** Animate and remove a toast element. */
+        function dismissToast(toast) {
+            if (!toast || !toast.parentNode) return;
+            clearTimeout(toast._autoRemove);
+            requestAnimationFrame(() => {
+                toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateX(100%)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
+                setTimeout(() => toast.remove(), 320);
+            });
         }
 
         // Action Functions
