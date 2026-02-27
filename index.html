@@ -808,52 +808,461 @@
             </div>
         </div>
 
-        <!-- Additional modules would continue here... -->
-        
-        <!-- Placeholder for other modules -->
-        <div id="module-rosters" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Team Rosters</h2>
-            <p class="text-slate-600">Roster management module - Add player cards here</p>
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- MODULE 6: ROSTERS                                       -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="module-rosters" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Team Rosters</h2>
+                    <p class="text-slate-500 text-sm mt-1">Manage athletes, view profiles, and track enrollment</p>
+                </div>
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="printRosters()" class="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-50 text-sm transition" aria-label="Print rosters">
+                        <i class="fas fa-print" aria-hidden="true"></i> Print
+                    </button>
+                    <button onclick="exportRosterCSV()" class="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-50 text-sm transition" aria-label="Export rosters to CSV">
+                        <i class="fas fa-download" aria-hidden="true"></i> Export CSV
+                    </button>
+                    <button onclick="openAddPlayerModal()" class="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700 transition" aria-label="Add new player">
+                        <i class="fas fa-plus" aria-hidden="true"></i> Add Player
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="flex flex-wrap gap-3 items-center">
+                <input id="roster-search" type="search" placeholder="Search athletes..." class="flex-1 min-w-[200px] px-4 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" oninput="filterRosters()" aria-label="Search athletes">
+                <select id="roster-filter-program" class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" onchange="filterRosters()" aria-label="Filter by program">
+                    <option value="">All Programs</option>
+                    <option value="Elite Basketball Camp">Elite Basketball Camp</option>
+                    <option value="Youth Soccer Academy">Youth Soccer Academy</option>
+                    <option value="Summer Swim League">Summer Swim League</option>
+                    <option value="Tennis Fundamentals">Tennis Fundamentals</option>
+                </select>
+                <select id="roster-filter-status" class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" onchange="filterRosters()" aria-label="Filter by status">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Waitlisted">Waitlisted</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+                <span id="roster-count" class="text-sm text-slate-500">Showing all athletes</span>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-brand-600" id="stat-total-athletes">24</div>
+                    <div class="text-xs text-slate-500 mt-1">Total Athletes</div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-green-600" id="stat-active">21</div>
+                    <div class="text-xs text-slate-500 mt-1">Active</div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-amber-600" id="stat-waitlisted">3</div>
+                    <div class="text-xs text-slate-500 mt-1">Waitlisted</div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-slate-600" id="stat-programs">4</div>
+                    <div class="text-xs text-slate-500 mt-1">Programs</div>
+                </div>
+            </div>
+
+            <!-- Player Grid -->
+            <div id="roster-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" aria-label="Athlete roster cards">
+                <!-- Cards rendered by JS -->
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- MODULE 7: SCHEDULE                                      -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="module-schedule" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Schedule & Events</h2>
+                    <p class="text-slate-500 text-sm mt-1">Manage practices, games, and special events</p>
+                </div>
+                <button onclick="openCreateEventModal()" class="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700 transition" aria-label="Create new event">
+                    <i class="fas fa-plus" aria-hidden="true"></i> New Event
+                </button>
+            </div>
+
+            <!-- Calendar Nav -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="flex items-center justify-between p-4 border-b border-slate-100">
+                    <button onclick="prevMonth()" class="p-2 hover:bg-slate-100 rounded-lg transition" aria-label="Previous month"><i class="fas fa-chevron-left text-slate-600" aria-hidden="true"></i></button>
+                    <h3 id="cal-month-label" class="text-lg font-semibold text-slate-900">February 2025</h3>
+                    <button onclick="nextMonth()" class="p-2 hover:bg-slate-100 rounded-lg transition" aria-label="Next month"><i class="fas fa-chevron-right text-slate-600" aria-hidden="true"></i></button>
+                </div>
+                <div class="grid grid-cols-7 text-center text-xs font-semibold text-slate-400 p-2 gap-1">
+                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div id="cal-grid" class="grid grid-cols-7 gap-1 p-2 pb-4" role="grid" aria-label="Calendar"></div>
+            </div>
+
+            <!-- Upcoming Events List -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-slate-900 mb-4">Upcoming Events</h3>
+                <div id="events-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- MODULE 8: FACILITIES                                    -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="module-facilities" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Facility Management</h2>
+                    <p class="text-slate-500 text-sm mt-1">Book courts, fields, and rooms</p>
+                </div>
+                <button onclick="openBookingModal()" class="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700 transition" aria-label="Book a facility">
+                    <i class="fas fa-plus" aria-hidden="true"></i> Book Facility
+                </button>
+            </div>
+
+            <!-- Facility Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="facilities-grid">
+                <!-- Rendered by JS -->
+            </div>
+
+            <!-- Bookings Table -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="font-semibold text-slate-900">Today's Bookings</h3>
+                    <span class="text-sm text-slate-500" id="bookings-date"></span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm" role="table" aria-label="Today's facility bookings">
+                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+                            <tr>
+                                <th class="px-4 py-3 text-left" scope="col">Facility</th>
+                                <th class="px-4 py-3 text-left" scope="col">Time</th>
+                                <th class="px-4 py-3 text-left" scope="col">Program</th>
+                                <th class="px-4 py-3 text-left" scope="col">Coach</th>
+                                <th class="px-4 py-3 text-left" scope="col">Status</th>
+                                <th class="px-4 py-3 text-left" scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-tbody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- MODULE 9: COMMERCE                                      -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="module-commerce" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Commerce Hub</h2>
+                    <p class="text-slate-500 text-sm mt-1">Track payments, invoices, and revenue</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openRecordPaymentModal()" class="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700 transition">
+                        <i class="fas fa-plus" aria-hidden="true"></i> Record Payment
+                    </button>
+                    <button onclick="sendPaymentReminders()" class="flex items-center gap-2 px-4 py-2 border border-amber-400 text-amber-700 rounded-xl text-sm hover:bg-amber-50 transition">
+                        <i class="fas fa-bell" aria-hidden="true"></i> Send Reminders
+                    </button>
+                </div>
+            </div>
+
+            <!-- Revenue KPIs -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-2xl p-4 shadow-sm">
+                    <div class="text-xs font-semibold opacity-80 mb-1">Total Revenue</div>
+                    <div class="text-2xl font-bold">$48,250</div>
+                    <div class="text-xs opacity-70 mt-1">+12% vs last month</div>
+                </div>
+                <div class="bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-2xl p-4 shadow-sm">
+                    <div class="text-xs font-semibold opacity-80 mb-1">Outstanding</div>
+                    <div class="text-2xl font-bold">$6,840</div>
+                    <div class="text-xs opacity-70 mt-1">12 families</div>
+                </div>
+                <div class="bg-gradient-to-br from-brand-500 to-brand-700 text-white rounded-2xl p-4 shadow-sm">
+                    <div class="text-xs font-semibold opacity-80 mb-1">This Month</div>
+                    <div class="text-2xl font-bold">$12,300</div>
+                    <div class="text-xs opacity-70 mt-1">37 transactions</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-500 to-violet-600 text-white rounded-2xl p-4 shadow-sm">
+                    <div class="text-xs font-semibold opacity-80 mb-1">Avg/Athlete</div>
+                    <div class="text-2xl font-bold">$512</div>
+                    <div class="text-xs opacity-70 mt-1">per season</div>
+                </div>
+            </div>
+
+            <!-- Payment Table -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="font-semibold text-slate-900">Recent Transactions</h3>
+                    <button onclick="exportCommerceCSV()" class="text-sm text-brand-600 hover:text-brand-700 flex items-center gap-1">
+                        <i class="fas fa-download text-xs" aria-hidden="true"></i> Export
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm" role="table" aria-label="Payment transactions">
+                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+                            <tr>
+                                <th class="px-4 py-3 text-left" scope="col">Athlete</th>
+                                <th class="px-4 py-3 text-left" scope="col">Program</th>
+                                <th class="px-4 py-3 text-left" scope="col">Amount</th>
+                                <th class="px-4 py-3 text-left" scope="col">Date</th>
+                                <th class="px-4 py-3 text-left" scope="col">Method</th>
+                                <th class="px-4 py-3 text-left" scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="commerce-tbody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- MODULE 10: INVENTORY                                    -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="module-inventory" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Inventory Management</h2>
+                    <p class="text-slate-500 text-sm mt-1">Track equipment, uniforms, and supplies</p>
+                </div>
+                <button onclick="openAddInventoryModal()" class="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700 transition" aria-label="Add inventory item">
+                    <i class="fas fa-plus" aria-hidden="true"></i> Add Item
+                </button>
+            </div>
+
+            <!-- Inventory Alerts -->
+            <div id="inventory-alerts" class="space-y-2"></div>
+
+            <!-- Filter -->
+            <div class="flex flex-wrap gap-3 items-center">
+                <input id="inventory-search" type="search" placeholder="Search items..." class="flex-1 min-w-[200px] px-4 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" oninput="renderInventory()" aria-label="Search inventory">
+                <select id="inventory-filter-category" class="px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" onchange="renderInventory()" aria-label="Filter by category">
+                    <option value="">All Categories</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Uniforms">Uniforms</option>
+                    <option value="Supplies">Supplies</option>
+                    <option value="Safety">Safety</option>
+                </select>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm" role="table" aria-label="Inventory items">
+                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+                            <tr>
+                                <th class="px-4 py-3 text-left" scope="col">Item</th>
+                                <th class="px-4 py-3 text-left" scope="col">Category</th>
+                                <th class="px-4 py-3 text-left" scope="col">In Stock</th>
+                                <th class="px-4 py-3 text-left" scope="col">Min Stock</th>
+                                <th class="px-4 py-3 text-left" scope="col">Location</th>
+                                <th class="px-4 py-3 text-left" scope="col">Status</th>
+                                <th class="px-4 py-3 text-left" scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-tbody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
         
-        <div id="module-schedule" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Schedule</h2>
-            <p class="text-slate-600">Calendar and scheduling module</p>
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- MODULE 11: MESSAGING                                    -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="module-messaging" class="module-view hidden p-4 sm:p-8 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Team Messages</h2>
+                    <p class="text-slate-500 text-sm mt-1">Direct and group communication</p>
+                </div>
+                <button onclick="openNewMessageModal()" class="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700 transition">
+                    <i class="fas fa-plus" aria-hidden="true"></i> New Message
+                </button>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden" style="height:600px;display:flex;">
+                <div class="w-72 border-r border-slate-100 flex flex-col flex-shrink-0">
+                    <div class="p-3 border-b border-slate-100">
+                        <input type="search" placeholder="Search conversations..." class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Search conversations">
+                    </div>
+                    <div id="conversation-list" class="flex-1 overflow-y-auto"></div>
+                </div>
+                <div class="flex-1 flex flex-col min-w-0">
+                    <div id="message-thread-header" class="p-4 border-b border-slate-100 bg-slate-50">
+                        <div class="font-semibold text-slate-900">Select a conversation</div>
+                    </div>
+                    <div id="message-thread" class="flex-1 overflow-y-auto p-4 space-y-3" aria-live="polite" aria-label="Message thread"></div>
+                    <div class="p-3 border-t border-slate-100">
+                        <div class="flex gap-2">
+                            <input id="msg-input" type="text" placeholder="Type a message..." class="flex-1 px-4 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Compose message" onkeydown="handleMsgKeydown(event)">
+                            <button onclick="sendMessage()" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700 transition" aria-label="Send message">
+                                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div id="module-facilities" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Facilities</h2>
-            <p class="text-slate-600">Facility booking and management</p>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- MODULE 12: ANNOUNCEMENTS                                -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="module-announcements" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Announcements</h2>
+                    <p class="text-slate-500 text-sm mt-1">Broadcast updates to teams and parents</p>
+                </div>
+                <button onclick="openAnnouncementComposer()" class="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700 transition" aria-label="Create announcement">
+                    <i class="fas fa-bullhorn" aria-hidden="true"></i> New Announcement
+                </button>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-brand-600" id="ann-published">8</div>
+                    <div class="text-xs text-slate-500 mt-1">Published</div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-amber-600" id="ann-scheduled">2</div>
+                    <div class="text-xs text-slate-500 mt-1">Scheduled</div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-green-600">94%</div>
+                    <div class="text-xs text-slate-500 mt-1">Open Rate</div>
+                </div>
+            </div>
+            <div id="announcements-feed" class="space-y-4" aria-label="Announcements feed"></div>
         </div>
-        
-        <div id="module-commerce" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Commerce Hub</h2>
-            <p class="text-slate-600">Store and payment management</p>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- MODULE 13: SAFETY                                       -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="module-safety" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Safety & Compliance</h2>
+                    <p class="text-slate-500 text-sm mt-1">Track certifications, waivers, and incidents</p>
+                </div>
+                <button onclick="openSafetyLogModal()" class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl text-sm hover:bg-red-700 transition" aria-label="Log safety incident">
+                    <i class="fas fa-shield-alt" aria-hidden="true"></i> Log Incident
+                </button>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-green-50 border border-green-200 rounded-2xl p-4 text-center">
+                    <div class="text-2xl font-bold text-green-700">18</div>
+                    <div class="text-xs text-green-600 mt-1 font-medium">Waivers Signed</div>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+                    <div class="text-2xl font-bold text-amber-700">3</div>
+                    <div class="text-xs text-amber-600 mt-1 font-medium">Pending Waivers</div>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-center">
+                    <div class="text-2xl font-bold text-blue-700">6</div>
+                    <div class="text-xs text-blue-600 mt-1 font-medium">Certifications</div>
+                </div>
+                <div class="bg-red-50 border border-red-200 rounded-2xl p-4 text-center">
+                    <div class="text-2xl font-bold text-red-700">1</div>
+                    <div class="text-xs text-red-600 mt-1 font-medium">Open Incidents</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-slate-900">Staff Certifications</h3>
+                        <button onclick="showToast('Adding certification record...', 'info')" class="text-xs text-brand-600 hover:underline">+ Add</button>
+                    </div>
+                    <div id="certifications-list" class="divide-y divide-slate-100"></div>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-slate-900">Incident Log</h3>
+                        <button onclick="openSafetyLogModal()" class="text-xs text-brand-600 hover:underline">+ Log</button>
+                    </div>
+                    <div id="incidents-list" class="divide-y divide-slate-100"></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100"><h3 class="font-semibold text-slate-900">Waiver Compliance</h3></div>
+                <div id="waiver-list" class="divide-y divide-slate-100"></div>
+            </div>
         </div>
-        
-        <div id="module-inventory" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Inventory</h2>
-            <p class="text-slate-600">Stock and inventory tracking</p>
-        </div>
-        
-        <div id="module-messaging" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Messages</h2>
-            <p class="text-slate-600">Team communication module</p>
-        </div>
-        
-        <div id="module-announcements" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Announcements</h2>
-            <p class="text-slate-600">Broadcast and news module</p>
-        </div>
-        
-        <div id="module-safety" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Safety & Compliance</h2>
-            <p class="text-slate-600">Document tracking and safety</p>
-        </div>
-        
-        <div id="module-reports" class="module-view hidden p-4 sm:p-8">
-            <h2 class="text-3xl font-bold text-slate-900 mb-6">Analytics</h2>
-            <p class="text-slate-600">Reports and analytics module</p>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- MODULE 14: REPORTS                                      -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="module-reports" class="module-view hidden p-4 sm:p-8 space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Analytics & Reporting</h2>
+                    <p class="text-slate-500 text-sm mt-1">Insights, trends, and performance metrics</p>
+                </div>
+                <button onclick="exportReportCSV()" class="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-xl text-sm text-slate-700 hover:bg-slate-50 transition" aria-label="Export report data">
+                    <i class="fas fa-download" aria-hidden="true"></i> Export Report
+                </button>
+            </div>
+
+            <!-- KPI Summary -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-brand-600">247</div>
+                    <div class="text-xs text-slate-500 mt-1">Total Athletes</div>
+                    <div class="text-xs text-green-600 mt-1">↑ 18% YoY</div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-green-600">$48,250</div>
+                    <div class="text-xs text-slate-500 mt-1">Revenue</div>
+                    <div class="text-xs text-green-600 mt-1">↑ 12% MoM</div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-purple-600">94%</div>
+                    <div class="text-xs text-slate-500 mt-1">Retention Rate</div>
+                    <div class="text-xs text-green-600 mt-1">↑ 3% QoQ</div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm text-center">
+                    <div class="text-2xl font-bold text-amber-600">4.8/5</div>
+                    <div class="text-xs text-slate-500 mt-1">Satisfaction</div>
+                    <div class="text-xs text-green-600 mt-1">↑ 0.2 pts</div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                    <h3 class="font-semibold text-slate-900 mb-4">Registration Trends</h3>
+                    <canvas id="reports-registration-chart" height="200" aria-label="Registration trends chart" role="img"></canvas>
+                </div>
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                    <h3 class="font-semibold text-slate-900 mb-4">Revenue by Program</h3>
+                    <canvas id="reports-revenue-chart" height="200" aria-label="Revenue by program chart" role="img"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Programs Table -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100">
+                    <h3 class="font-semibold text-slate-900">Program Performance</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm" role="table" aria-label="Program performance metrics">
+                        <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+                            <tr>
+                                <th class="px-4 py-3 text-left" scope="col">Program</th>
+                                <th class="px-4 py-3 text-left" scope="col">Enrolled</th>
+                                <th class="px-4 py-3 text-left" scope="col">Capacity</th>
+                                <th class="px-4 py-3 text-left" scope="col">Revenue</th>
+                                <th class="px-4 py-3 text-left" scope="col">Retention</th>
+                                <th class="px-4 py-3 text-left" scope="col">Health</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-programs-tbody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
     </main>
@@ -893,11 +1302,149 @@
 
     <!-- JavaScript -->
     <script>
+        // ════════════════════════════════════════════════════════
+        // ITEM 56: LocalStorage Data Store
+        // ════════════════════════════════════════════════════════
+        function storeSet(key, data) {
+            try { localStorage.setItem('athleteos_' + key, JSON.stringify(data)); } catch(e) {}
+        }
+        function storeGet(key, defaultVal) {
+            try { const r = localStorage.getItem('athleteos_' + key); return r ? JSON.parse(r) : defaultVal; }
+            catch(e) { return defaultVal; }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEMS 57-62: Seed Data
+        // ════════════════════════════════════════════════════════
+        const SEED = {
+            athletes: [
+                { id:1, name:'Marcus Johnson', age:14, program:'Elite Basketball Camp', status:'Active', phone:'(555) 101-2020', email:'marcus.j@email.com', guardian:'Sharon Johnson', dob:'2010-03-15', paid:true },
+                { id:2, name:'Sofia Martinez', age:12, program:'Youth Soccer Academy', status:'Active', phone:'(555) 202-3030', email:'sofia.m@email.com', guardian:'Carlos Martinez', dob:'2012-07-22', paid:true },
+                { id:3, name:'Ethan Williams', age:16, program:'Elite Basketball Camp', status:'Active', phone:'(555) 303-4040', email:'ethan.w@email.com', guardian:'David Williams', dob:'2008-11-08', paid:false },
+                { id:4, name:'Aisha Thompson', age:10, program:'Summer Swim League', status:'Active', phone:'(555) 404-5050', email:'aisha.t@email.com', guardian:'Maria Thompson', dob:'2014-05-30', paid:true },
+                { id:5, name:'Jaylen Davis', age:13, program:'Youth Soccer Academy', status:'Waitlisted', phone:'(555) 505-6060', email:'jaylen.d@email.com', guardian:'Karen Davis', dob:'2011-09-12', paid:false },
+                { id:6, name:'Lily Chen', age:11, program:'Tennis Fundamentals', status:'Active', phone:'(555) 606-7070', email:'lily.c@email.com', guardian:'Wei Chen', dob:'2013-02-18', paid:true },
+                { id:7, name:'Noah Anderson', age:15, program:'Elite Basketball Camp', status:'Active', phone:'(555) 707-8080', email:'noah.a@email.com', guardian:'Janet Anderson', dob:'2009-06-25', paid:true },
+                { id:8, name:'Ava Robinson', age:9, program:'Summer Swim League', status:'Active', phone:'(555) 808-9090', email:'ava.r@email.com', guardian:'Tom Robinson', dob:'2015-01-14', paid:true },
+                { id:9, name:'Caleb Brown', age:14, program:'Youth Soccer Academy', status:'Active', phone:'(555) 909-0101', email:'caleb.b@email.com', guardian:'Lisa Brown', dob:'2010-08-03', paid:false },
+                { id:10, name:'Emma Garcia', age:12, program:'Tennis Fundamentals', status:'Waitlisted', phone:'(555) 010-1212', email:'emma.g@email.com', guardian:'Jose Garcia', dob:'2012-04-27', paid:false },
+                { id:11, name:'Liam Wilson', age:16, program:'Elite Basketball Camp', status:'Active', phone:'(555) 111-2222', email:'liam.w@email.com', guardian:'Susan Wilson', dob:'2008-12-01', paid:true },
+                { id:12, name:'Mia Taylor', age:10, program:'Summer Swim League', status:'Active', phone:'(555) 222-3333', email:'mia.t@email.com', guardian:'Robert Taylor', dob:'2014-03-09', paid:true },
+            ],
+            events: [
+                { id:1, title:'Basketball Practice', date:'2025-02-27', time:'4:00 PM', duration:'2h', facility:'Main Gym', program:'Elite Basketball Camp', type:'practice', coach:'Coach Davis' },
+                { id:2, title:'Soccer Scrimmage', date:'2025-02-28', time:'9:00 AM', duration:'1.5h', facility:'South Field', program:'Youth Soccer Academy', type:'game', coach:'Coach Santos' },
+                { id:3, title:'Swim Meet', date:'2025-03-01', time:'8:00 AM', duration:'3h', facility:'Aquatic Center', program:'Summer Swim League', type:'competition', coach:'Coach Kim' },
+                { id:4, title:'Tennis Clinic', date:'2025-03-02', time:'10:00 AM', duration:'1h', facility:'Tennis Courts A', program:'Tennis Fundamentals', type:'clinic', coach:'Coach Rivera' },
+                { id:5, title:'Parent Meeting', date:'2025-03-05', time:'6:00 PM', duration:'1h', facility:'Conference Room', program:'All Programs', type:'meeting', coach:'Admin' },
+                { id:6, title:'Basketball Tournament', date:'2025-03-08', time:'9:00 AM', duration:'6h', facility:'Main Gym', program:'Elite Basketball Camp', type:'competition', coach:'Coach Davis' },
+            ],
+            facilities: [
+                { id:1, name:'Main Gymnasium', type:'Indoor', capacity:200, status:'Available', amenities:['Sound System','Scoreboard','Storage'], bookings:3 },
+                { id:2, name:'South Field', type:'Outdoor', capacity:100, status:'Available', amenities:['Lights','Irrigation','Bleachers'], bookings:2 },
+                { id:3, name:'Aquatic Center', type:'Indoor', capacity:80, status:'Maintenance', amenities:['8 Lanes','Timing System','Locker Rooms'], bookings:0 },
+                { id:4, name:'Tennis Courts A', type:'Outdoor', capacity:16, status:'Available', amenities:['4 Courts','Ball Machine','Lighting'], bookings:1 },
+                { id:5, name:'Weight Room', type:'Indoor', capacity:25, status:'Available', amenities:['Free Weights','Cardio','A/C'], bookings:4 },
+                { id:6, name:'Conference Room', type:'Indoor', capacity:30, status:'Available', amenities:['Projector','Whiteboard','Video Conf'], bookings:1 },
+            ],
+            bookings: [
+                { id:1, facility:'Main Gymnasium', time:'8:00 AM – 10:00 AM', program:'Elite Basketball Camp', coach:'Coach Davis', status:'Confirmed' },
+                { id:2, facility:'South Field', time:'10:00 AM – 12:00 PM', program:'Youth Soccer Academy', coach:'Coach Santos', status:'Confirmed' },
+                { id:3, facility:'Tennis Courts A', time:'2:00 PM – 4:00 PM', program:'Tennis Fundamentals', coach:'Coach Rivera', status:'Pending' },
+                { id:4, facility:'Weight Room', time:'6:00 PM – 8:00 PM', program:'Elite Basketball Camp', coach:'Coach Davis', status:'Confirmed' },
+            ],
+            payments: [
+                { id:1, athlete:'Marcus Johnson', program:'Elite Basketball Camp', amount:450, date:'2025-02-15', method:'Credit Card', status:'Paid' },
+                { id:2, athlete:'Sofia Martinez', program:'Youth Soccer Academy', amount:320, date:'2025-02-14', method:'Check', status:'Paid' },
+                { id:3, athlete:'Ethan Williams', program:'Elite Basketball Camp', amount:450, date:'2025-02-10', method:'Online', status:'Overdue' },
+                { id:4, athlete:'Aisha Thompson', program:'Summer Swim League', amount:280, date:'2025-02-18', method:'Credit Card', status:'Paid' },
+                { id:5, athlete:'Jaylen Davis', program:'Youth Soccer Academy', amount:320, date:'2025-01-30', method:'-', status:'Pending' },
+                { id:6, athlete:'Lily Chen', program:'Tennis Fundamentals', amount:210, date:'2025-02-20', method:'Cash', status:'Paid' },
+                { id:7, athlete:'Caleb Brown', program:'Youth Soccer Academy', amount:320, date:'2025-01-15', method:'-', status:'Overdue' },
+                { id:8, athlete:'Emma Garcia', program:'Tennis Fundamentals', amount:210, date:'2025-02-22', method:'Check', status:'Pending' },
+            ],
+            inventory: [
+                { id:1, name:'Basketballs (Official)', category:'Equipment', stock:24, minStock:15, location:'Storage A', unitCost:45 },
+                { id:2, name:'Soccer Balls', category:'Equipment', stock:18, minStock:10, location:'South Field Shed', unitCost:35 },
+                { id:3, name:'Basketball Jerseys (L)', category:'Uniforms', stock:3, minStock:10, location:'Uniform Room', unitCost:28 },
+                { id:4, name:'First Aid Kits', category:'Safety', stock:5, minStock:8, location:'All Facilities', unitCost:40 },
+                { id:5, name:'Swim Caps', category:'Equipment', stock:45, minStock:20, location:'Aquatic Center', unitCost:8 },
+                { id:6, name:'Tennis Rackets', category:'Equipment', stock:12, minStock:8, location:'Tennis Courts', unitCost:55 },
+                { id:7, name:'Cones (Orange)', category:'Supplies', stock:60, minStock:30, location:'Equipment Room', unitCost:2 },
+                { id:8, name:'Soccer Jerseys (M)', category:'Uniforms', stock:6, minStock:12, location:'Uniform Room', unitCost:25 },
+                { id:9, name:'Whistles', category:'Equipment', stock:8, minStock:5, location:'Admin Office', unitCost:12 },
+                { id:10, name:'Ice Packs', category:'Safety', stock:2, minStock:10, location:'Trainer Room', unitCost:5 },
+            ],
+            conversations: [
+                { id:1, name:'Coach Davis', role:'Head Coach', avatar:'CD', unread:2, lastMsg:'Practice lineup confirmed for Thursday', time:'2m' },
+                { id:2, name:'Johnson Family', role:'Parent', avatar:'JF', unread:0, lastMsg:'Marcus will be 15 minutes late tomorrow', time:'1h' },
+                { id:3, name:'Elite Basketball Team', role:'Group', avatar:'EB', unread:5, lastMsg:'Tournament details posted!', time:'3h' },
+                { id:4, name:'Coach Santos', role:'Asst Coach', avatar:'CS', unread:0, lastMsg:'Field maintenance scheduled for Monday', time:'1d' },
+                { id:5, name:'Martinez Family', role:'Parent', avatar:'MF', unread:1, lastMsg:'Sofia has a doctor appointment Friday', time:'2d' },
+            ],
+            messages: {
+                1: [
+                    { from:'Coach Davis', text:'Hey! Practice starts at 4pm sharp tomorrow.', time:'10:30 AM', mine:false },
+                    { from:'Me', text:'Got it! The gym will be ready.', time:'10:32 AM', mine:true },
+                    { from:'Coach Davis', text:'Practice lineup confirmed for Thursday', time:'11:45 AM', mine:false },
+                ],
+                2: [
+                    { from:'Me', text:'Hi! Just confirming Marcus for Thursday practice.', time:'Yesterday', mine:true },
+                    { from:'Johnson Family', text:'Marcus will be 15 minutes late tomorrow', time:'Yesterday', mine:false },
+                ],
+                3: [
+                    { from:'Admin', text:'Tournament brackets are posted on the website.', time:'9:00 AM', mine:false },
+                    { from:'Coach Davis', text:'Tournament details posted!', time:'9:05 AM', mine:false },
+                    { from:'Me', text:'Great news! See everyone there.', time:'9:10 AM', mine:true },
+                ],
+            },
+            announcements: [
+                { id:1, title:'Spring Season Registration Now Open!', body:'We are thrilled to announce that spring season registration is now open for all programs. Early bird pricing ends March 15th. Register today!', audience:'All Families', date:'2025-02-20', pinned:true, status:'published' },
+                { id:2, title:'Elite Basketball Camp Tournament', body:'The inter-division tournament will be held on March 8th starting at 9 AM. All parents and family members are welcome. Concessions will be available.', audience:'Basketball Families', date:'2025-02-18', pinned:false, status:'published' },
+                { id:3, title:'Aquatic Center Scheduled Maintenance', body:'The Aquatic Center will be closed for maintenance Feb 25–28. Swim League practice will move to the outdoor pool.', audience:'Swim League Families', date:'2025-02-15', pinned:false, status:'published' },
+                { id:4, title:'Parent Volunteer Opportunities', body:'We are looking for volunteers for spring events. Please fill out the volunteer interest form on our website.', audience:'All Families', date:'2025-03-05', pinned:false, status:'scheduled' },
+            ],
+            certifications: [
+                { staff:'Coach Davis', cert:'CPR/AED Certified', expiry:'2025-08-15', status:'valid' },
+                { staff:'Coach Santos', cert:'First Aid Level 2', expiry:'2025-06-30', status:'valid' },
+                { staff:'Coach Kim', cert:'Lifeguard Certification', expiry:'2025-03-01', status:'expiring' },
+                { staff:'Coach Rivera', cert:'Sports Safety Training', expiry:'2026-01-20', status:'valid' },
+                { staff:'Alex Rivera', cert:'Child Protection Training', expiry:'2025-05-10', status:'valid' },
+                { staff:'Team Trainer', cert:'Athletic Training License', expiry:'2024-12-31', status:'expired' },
+            ],
+            incidents: [
+                { id:1, athlete:'Noah Anderson', type:'Minor Injury', description:'Twisted ankle during basketball drill', date:'2025-02-20', status:'Resolved', severity:'low' },
+                { id:2, athlete:'Aisha Thompson', type:'Equipment Issue', description:'Lane divider malfunction in pool', date:'2025-02-22', status:'Open', severity:'medium' },
+            ],
+            waivers: [
+                { athlete:'Marcus Johnson', waiver:'Liability Waiver', signed:true, date:'2025-01-15' },
+                { athlete:'Sofia Martinez', waiver:'Medical Release', signed:true, date:'2025-01-16' },
+                { athlete:'Ethan Williams', waiver:'Liability Waiver', signed:true, date:'2025-01-14' },
+                { athlete:'Aisha Thompson', waiver:'Medical Release', signed:true, date:'2025-01-18' },
+                { athlete:'Jaylen Davis', waiver:'Liability Waiver', signed:false, date:null },
+                { athlete:'Lily Chen', waiver:'Liability Waiver', signed:true, date:'2025-01-20' },
+                { athlete:'Noah Anderson', waiver:'Medical Release', signed:false, date:null },
+                { athlete:'Ava Robinson', waiver:'Liability Waiver', signed:false, date:null },
+            ],
+        };
+
+        function initData() {
+            if (!storeGet('athletes',null)) storeSet('athletes', SEED.athletes);
+            if (!storeGet('events',null)) storeSet('events', SEED.events);
+            if (!storeGet('payments',null)) storeSet('payments', SEED.payments);
+            if (!storeGet('inventory',null)) storeSet('inventory', SEED.inventory);
+            if (!storeGet('announcements',null)) storeSet('announcements', SEED.announcements);
+        }
+
+        // ════════════════════════════════════════════════════════
         // State Management
+        // ════════════════════════════════════════════════════════
         const AppState = {
             currentModule: 'dashboard',
             notifications: 5,
             messages: 3,
+            activeConversation: null,
+            calendarDate: new Date(2025, 1, 1),
             user: {
                 name: 'Alex Rivera',
                 role: 'Program Director',
@@ -963,7 +1510,696 @@
             }
             
             AppState.currentModule = moduleName;
+            // ITEM 27: Persist active module to localStorage
+            storeSet('currentModule', moduleName);
             window.scrollTo(0, 0);
+
+            // ITEM 83: Lazy-initialize module data on first visit
+            if (moduleName === 'rosters') renderRosters();
+            else if (moduleName === 'schedule') renderCalendar();
+            else if (moduleName === 'facilities') renderFacilities();
+            else if (moduleName === 'commerce') renderCommerce();
+            else if (moduleName === 'inventory') renderInventory();
+            else if (moduleName === 'messaging') renderMessaging();
+            else if (moduleName === 'announcements') renderAnnouncements();
+            else if (moduleName === 'safety') renderSafety();
+            else if (moduleName === 'reports') renderReports();
+        }
+
+        // ════════════════════════════════════════════════════════
+        // MODULE 6 RENDERER: ROSTERS
+        // ════════════════════════════════════════════════════════
+
+        /** ITEM 57: Render athlete cards with filtering */
+        function renderRosters() {
+            const athletes = storeGet('athletes', SEED.athletes);
+            const search = (document.getElementById('roster-search')?.value || '').toLowerCase();
+            const progFilter = document.getElementById('roster-filter-program')?.value || '';
+            const statusFilter = document.getElementById('roster-filter-status')?.value || '';
+
+            const filtered = athletes.filter(a => {
+                const matchSearch = !search || a.name.toLowerCase().includes(search) || a.program.toLowerCase().includes(search);
+                const matchProg = !progFilter || a.program === progFilter;
+                const matchStatus = !statusFilter || a.status === statusFilter;
+                return matchSearch && matchProg && matchStatus;
+            });
+
+            const grid = document.getElementById('roster-grid');
+            if (!grid) return;
+            const count = document.getElementById('roster-count');
+            if (count) count.textContent = `Showing ${filtered.length} of ${athletes.length} athletes`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                const empty = document.createElement('div');
+                empty.className = 'col-span-full text-center py-16 text-slate-400';
+                empty.innerHTML = '<i class="fas fa-users text-5xl mb-4 block"></i><p class="text-lg font-medium">No athletes found</p><p class="text-sm mt-1">Try adjusting your filters</p>';
+                grid.appendChild(empty);
+                return;
+            }
+
+            grid.innerHTML = '';
+            filtered.forEach(athlete => {
+                const statusColors = { Active: 'bg-green-100 text-green-700', Waitlisted: 'bg-amber-100 text-amber-700', Inactive: 'bg-slate-100 text-slate-600' };
+                const initials = athlete.name.split(' ').map(n=>n[0]).join('');
+                const colorPalette = ['bg-brand-500','bg-purple-500','bg-green-500','bg-amber-500','bg-rose-500'];
+                const bgColor = colorPalette[athlete.id % colorPalette.length];
+                const payBadge = athlete.paid ? '<span class="text-xs text-green-600"><i class="fas fa-check-circle"></i> Paid</span>' : '<span class="text-xs text-red-500"><i class="fas fa-exclamation-circle"></i> Unpaid</span>';
+
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-slate-100 shadow-sm p-4 hover:shadow-md transition cursor-pointer';
+                card.setAttribute('role', 'article');
+                card.setAttribute('aria-label', 'Athlete: ' + athlete.name);
+
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = `w-12 h-12 ${bgColor} rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-3`;
+                avatarDiv.textContent = initials;
+                avatarDiv.setAttribute('aria-hidden', 'true');
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'text-center';
+                const nameEl = document.createElement('div');
+                nameEl.className = 'font-semibold text-slate-900 text-sm';
+                nameEl.textContent = athlete.name;
+                const ageEl = document.createElement('div');
+                ageEl.className = 'text-xs text-slate-400 mt-0.5';
+                ageEl.textContent = `Age ${athlete.age}`;
+
+                const statusEl = document.createElement('div');
+                statusEl.className = 'text-center mt-2';
+                const statusBadge = document.createElement('span');
+                statusBadge.className = `text-xs px-2 py-0.5 rounded-full font-medium ${(statusColors[athlete.status] || 'bg-slate-100 text-slate-600')}`;
+                statusBadge.textContent = athlete.status;
+
+                const progEl = document.createElement('div');
+                progEl.className = 'text-xs text-slate-500 text-center mt-1 truncate px-2';
+                progEl.textContent = athlete.program;
+                progEl.title = athlete.program;
+
+                const payEl = document.createElement('div');
+                payEl.className = 'text-center mt-2';
+                payEl.innerHTML = payBadge;
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'flex gap-1 mt-3 justify-center';
+                const viewBtn = document.createElement('button');
+                viewBtn.className = 'flex-1 text-xs py-1 px-2 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-700 transition';
+                viewBtn.textContent = 'View';
+                viewBtn.setAttribute('aria-label', 'View ' + athlete.name + ' profile');
+                viewBtn.onclick = () => openAthleteProfile(athlete.id);
+                const editBtn = document.createElement('button');
+                editBtn.className = 'flex-1 text-xs py-1 px-2 bg-brand-50 hover:bg-brand-100 rounded-lg text-brand-700 transition';
+                editBtn.textContent = 'Edit';
+                editBtn.setAttribute('aria-label', 'Edit ' + athlete.name);
+                editBtn.onclick = () => openEditAthleteModal(athlete.id);
+
+                nameDiv.appendChild(nameEl);
+                nameDiv.appendChild(ageEl);
+                statusEl.appendChild(statusBadge);
+                actionsDiv.appendChild(viewBtn);
+                actionsDiv.appendChild(editBtn);
+
+                card.appendChild(avatarDiv);
+                card.appendChild(nameDiv);
+                card.appendChild(statusEl);
+                card.appendChild(progEl);
+                card.appendChild(payEl);
+                card.appendChild(actionsDiv);
+                grid.appendChild(card);
+            });
+        }
+        function filterRosters() { renderRosters(); }
+
+        // ════════════════════════════════════════════════════════
+        // MODULE 7 RENDERER: SCHEDULE / CALENDAR
+        // ════════════════════════════════════════════════════════
+
+        /** ITEM 59: Render calendar grid and events list */
+        function renderCalendar() {
+            const d = AppState.calendarDate;
+            const year = d.getFullYear(), month = d.getMonth();
+            const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            const label = document.getElementById('cal-month-label');
+            if (label) label.textContent = monthNames[month] + ' ' + year;
+
+            const grid = document.getElementById('cal-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month+1, 0).getDate();
+            const events = storeGet('events', SEED.events);
+            const eventsByDate = {};
+            events.forEach(ev => { if (!eventsByDate[ev.date]) eventsByDate[ev.date] = []; eventsByDate[ev.date].push(ev); });
+
+            // Empty cells before first day
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'h-10';
+                grid.appendChild(empty);
+            }
+            // Day cells
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const hasEvent = eventsByDate[dateStr];
+                const today = new Date();
+                const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===day;
+
+                const cell = document.createElement('div');
+                cell.className = `h-10 flex flex-col items-center justify-start pt-1 rounded-lg cursor-pointer transition text-sm
+                    ${isToday ? 'bg-brand-600 text-white font-bold' : 'hover:bg-slate-100 text-slate-700'}`;
+                cell.setAttribute('role', 'gridcell');
+                cell.setAttribute('aria-label', `${monthNames[month]} ${day}, ${year}${hasEvent ? ', has events' : ''}`);
+                cell.onclick = () => showDayEvents(dateStr, eventsByDate[dateStr] || []);
+
+                const dayNum = document.createElement('span');
+                dayNum.textContent = day;
+                cell.appendChild(dayNum);
+
+                if (hasEvent) {
+                    const dot = document.createElement('div');
+                    dot.className = `w-1 h-1 rounded-full mt-0.5 ${isToday ? 'bg-white' : 'bg-brand-500'}`;
+                    dot.setAttribute('aria-hidden', 'true');
+                    cell.appendChild(dot);
+                }
+                grid.appendChild(cell);
+            }
+
+            // Render events list
+            renderEventsList(events);
+        }
+
+        function prevMonth() { AppState.calendarDate.setMonth(AppState.calendarDate.getMonth()-1); renderCalendar(); }
+        function nextMonth() { AppState.calendarDate.setMonth(AppState.calendarDate.getMonth()+1); renderCalendar(); }
+
+        function renderEventsList(events) {
+            const list = document.getElementById('events-list');
+            if (!list) return;
+            list.innerHTML = '';
+            const typeColors = { practice:'bg-brand-100 text-brand-700', game:'bg-green-100 text-green-700', competition:'bg-purple-100 text-purple-700', clinic:'bg-amber-100 text-amber-700', meeting:'bg-slate-100 text-slate-700' };
+            const typeIcons = { practice:'fa-basketball-ball', game:'fa-futbol', competition:'fa-trophy', clinic:'fa-chalkboard-teacher', meeting:'fa-users' };
+
+            if (events.length === 0) {
+                const empty = document.createElement('p');
+                empty.className = 'text-slate-400 text-sm text-center py-8';
+                empty.textContent = 'No upcoming events';
+                list.appendChild(empty);
+                return;
+            }
+            events.slice(0, 6).forEach(ev => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition cursor-pointer';
+                row.innerHTML = `
+                    <div class="w-10 h-10 ${(typeColors[ev.type]||'bg-slate-100 text-slate-700')} rounded-xl flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                        <i class="fas ${typeIcons[ev.type]||'fa-calendar'} text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium text-slate-900 text-sm">${ev.title}</div>
+                        <div class="text-xs text-slate-500">${ev.date} at ${ev.time} · ${ev.facility}</div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <div class="text-xs font-medium text-slate-700">${ev.duration}</div>
+                        <div class="text-xs text-slate-400">${ev.coach}</div>
+                    </div>
+                    <button onclick="checkInPlayers('${ev.id}')" class="text-xs px-2 py-1 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition" aria-label="Check in players for ${ev.title}">Check In</button>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function showDayEvents(dateStr, events) {
+            if (events.length === 0) { showToast(`No events on ${dateStr}`, 'info'); return; }
+            const titles = events.map(e=>e.title).join(', ');
+            showToast(`${events.length} event(s) on ${dateStr}: ${titles}`, 'info');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // MODULE 8 RENDERER: FACILITIES
+        // ════════════════════════════════════════════════════════
+
+        /** ITEM 60: Render facility cards and bookings */
+        function renderFacilities() {
+            const facilities = SEED.facilities;
+            const grid = document.getElementById('facilities-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const statusColors = { Available:'bg-green-100 text-green-700', Maintenance:'bg-red-100 text-red-700', Booked:'bg-amber-100 text-amber-700' };
+            facilities.forEach(f => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md transition';
+                const statusBadge = `<span class="text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[f.status]||'bg-slate-100 text-slate-600'}">${f.status}</span>`;
+                const amenitiesHtml = f.amenities.map(a=>`<span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">${a}</span>`).join(' ');
+                const typeIcon = f.type === 'Outdoor' ? 'fa-sun' : 'fa-building';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 bg-brand-100 text-brand-600 rounded-xl flex items-center justify-center" aria-hidden="true">
+                            <i class="fas ${typeIcon}"></i>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div class="font-semibold text-slate-900 mb-1">${f.name}</div>
+                    <div class="text-xs text-slate-500 mb-2">${f.type} · Capacity: ${f.capacity}</div>
+                    <div class="flex flex-wrap gap-1 mb-3">${amenitiesHtml}</div>
+                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
+                        <span class="text-xs text-slate-500">${f.bookings} booking(s) today</span>
+                        <button onclick="openBookingModal('${f.id}')" class="text-xs px-3 py-1 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition ${f.status==='Maintenance'?'opacity-50 cursor-not-allowed':''}" ${f.status==='Maintenance'?'disabled':''} aria-label="Book ${f.name}">Book</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Bookings table
+            const tbody = document.getElementById('bookings-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            const dateEl = document.getElementById('bookings-date');
+            if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+            SEED.bookings.forEach(b => {
+                const statusBadge = b.status === 'Confirmed'
+                    ? '<span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">Confirmed</span>'
+                    : '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">Pending</span>';
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-medium text-slate-900">${b.facility}</td>
+                    <td class="px-4 py-3 text-slate-600">${b.time}</td>
+                    <td class="px-4 py-3 text-slate-600">${b.program}</td>
+                    <td class="px-4 py-3 text-slate-600">${b.coach}</td>
+                    <td class="px-4 py-3">${statusBadge}</td>
+                    <td class="px-4 py-3">
+                        <button onclick="showToast('Editing booking...','info')" class="text-xs text-brand-600 hover:underline" aria-label="Edit booking for ${b.facility}">Edit</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ════════════════════════════════════════════════════════
+        // MODULE 9 RENDERER: COMMERCE
+        // ════════════════════════════════════════════════════════
+
+        /** ITEM 66: Render payment table with status tracking */
+        function renderCommerce() {
+            const payments = storeGet('payments', SEED.payments);
+            const tbody = document.getElementById('commerce-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const statusColors = { Paid:'bg-green-100 text-green-700', Pending:'bg-amber-100 text-amber-700', Overdue:'bg-red-100 text-red-700' };
+            payments.forEach(p => {
+                const statusBadge = `<span class="px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[p.status]||'bg-slate-100 text-slate-600'}">${p.status}</span>`;
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-medium text-slate-900">${p.athlete}</td>
+                    <td class="px-4 py-3 text-slate-600 text-sm">${p.program}</td>
+                    <td class="px-4 py-3 font-semibold text-slate-900">$${p.amount.toFixed(2)}</td>
+                    <td class="px-4 py-3 text-slate-500 text-sm">${p.date}</td>
+                    <td class="px-4 py-3 text-slate-500 text-sm">${p.method}</td>
+                    <td class="px-4 py-3">${statusBadge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ════════════════════════════════════════════════════════
+        // MODULE 10 RENDERER: INVENTORY
+        // ════════════════════════════════════════════════════════
+
+        /** ITEM 61 + 91: Render inventory with low-stock alerts */
+        function renderInventory() {
+            const items = storeGet('inventory', SEED.inventory);
+            const search = (document.getElementById('inventory-search')?.value || '').toLowerCase();
+            const catFilter = document.getElementById('inventory-filter-category')?.value || '';
+            const filtered = items.filter(i => {
+                const matchSearch = !search || i.name.toLowerCase().includes(search);
+                const matchCat = !catFilter || i.category === catFilter;
+                return matchSearch && matchCat;
+            });
+
+            // Alerts
+            const alertsDiv = document.getElementById('inventory-alerts');
+            if (alertsDiv) {
+                const lowStock = items.filter(i => i.stock <= i.minStock);
+                alertsDiv.innerHTML = '';
+                if (lowStock.length > 0) {
+                    const alertEl = document.createElement('div');
+                    alertEl.className = 'bg-amber-50 border border-amber-300 rounded-xl p-3 flex items-center gap-2';
+                    alertEl.setAttribute('role', 'alert');
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-exclamation-triangle text-amber-500 flex-shrink-0';
+                    icon.setAttribute('aria-hidden', 'true');
+                    const text = document.createElement('span');
+                    text.className = 'text-sm text-amber-800';
+                    text.textContent = `${lowStock.length} item(s) are below minimum stock: ${lowStock.map(i=>i.name).join(', ')}`;
+                    alertEl.appendChild(icon);
+                    alertEl.appendChild(text);
+                    alertsDiv.appendChild(alertEl);
+                }
+            }
+
+            const tbody = document.getElementById('inventory-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            filtered.forEach(item => {
+                const isLow = item.stock <= item.minStock;
+                const stockColor = isLow ? 'text-red-600 font-bold' : 'text-slate-900';
+                const statusBadge = isLow
+                    ? '<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-medium">Low Stock</span>'
+                    : '<span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">OK</span>';
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-medium text-slate-900">${item.name}</td>
+                    <td class="px-4 py-3 text-slate-500 text-sm">${item.category}</td>
+                    <td class="px-4 py-3 ${stockColor}">${item.stock}</td>
+                    <td class="px-4 py-3 text-slate-500">${item.minStock}</td>
+                    <td class="px-4 py-3 text-slate-500 text-sm">${item.location}</td>
+                    <td class="px-4 py-3">${statusBadge}</td>
+                    <td class="px-4 py-3 flex gap-2">
+                        <button onclick="adjustInventory(${item.id},1)" class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition" aria-label="Increase stock for ${item.name}">+</button>
+                        <button onclick="adjustInventory(${item.id},-1)" class="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition" aria-label="Decrease stock for ${item.name}">−</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        /** ITEM 61: Adjust stock level for an inventory item */
+        function adjustInventory(itemId, delta) {
+            const items = storeGet('inventory', SEED.inventory);
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+            item.stock = Math.max(0, item.stock + delta);
+            storeSet('inventory', items);
+            renderInventory();
+            showToast(`${item.name} stock updated to ${item.stock}`, delta > 0 ? 'success' : 'info');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // MODULE 11 RENDERER: MESSAGING
+        // ════════════════════════════════════════════════════════
+
+        /** ITEM 62: Render conversation list and thread */
+        function renderMessaging() {
+            const convList = document.getElementById('conversation-list');
+            if (!convList) return;
+            convList.innerHTML = '';
+
+            SEED.conversations.forEach(conv => {
+                const item = document.createElement('div');
+                item.className = `flex items-center gap-3 p-3 cursor-pointer hover:bg-slate-50 transition border-b border-slate-50 ${AppState.activeConversation===conv.id?'bg-brand-50':''} `;
+                item.setAttribute('role', 'button');
+                item.setAttribute('aria-label', `Conversation with ${conv.name}`);
+                item.onclick = () => openConversation(conv.id);
+
+                const avatar = document.createElement('div');
+                avatar.className = 'w-9 h-9 bg-brand-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0';
+                avatar.textContent = conv.avatar;
+                avatar.setAttribute('aria-hidden', 'true');
+
+                const info = document.createElement('div');
+                info.className = 'flex-1 min-w-0';
+                const nameRow = document.createElement('div');
+                nameRow.className = 'flex items-center justify-between';
+                const nameEl = document.createElement('span');
+                nameEl.className = 'text-sm font-medium text-slate-900 truncate';
+                nameEl.textContent = conv.name;
+                const timeEl = document.createElement('span');
+                timeEl.className = 'text-xs text-slate-400 flex-shrink-0';
+                timeEl.textContent = conv.time;
+                nameRow.appendChild(nameEl);
+                nameRow.appendChild(timeEl);
+
+                const msgRow = document.createElement('div');
+                msgRow.className = 'flex items-center justify-between mt-0.5';
+                const msgEl = document.createElement('span');
+                msgEl.className = 'text-xs text-slate-500 truncate';
+                msgEl.textContent = conv.lastMsg;
+                if (conv.unread > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'ml-2 w-5 h-5 bg-brand-600 text-white rounded-full text-xs flex items-center justify-center flex-shrink-0';
+                    badge.textContent = conv.unread;
+                    badge.setAttribute('aria-label', conv.unread + ' unread messages');
+                    msgRow.appendChild(msgEl);
+                    msgRow.appendChild(badge);
+                } else {
+                    msgRow.appendChild(msgEl);
+                }
+
+                info.appendChild(nameRow);
+                info.appendChild(msgRow);
+                item.appendChild(avatar);
+                item.appendChild(info);
+                convList.appendChild(item);
+            });
+
+            if (AppState.activeConversation) openConversation(AppState.activeConversation);
+        }
+
+        function openConversation(convId) {
+            AppState.activeConversation = convId;
+            const conv = SEED.conversations.find(c => c.id === convId);
+            if (!conv) return;
+
+            const header = document.getElementById('message-thread-header');
+            if (header) {
+                header.innerHTML = '';
+                const nameEl = document.createElement('div');
+                nameEl.className = 'font-semibold text-slate-900';
+                nameEl.textContent = conv.name;
+                const roleEl = document.createElement('div');
+                roleEl.className = 'text-xs text-slate-500';
+                roleEl.textContent = conv.role;
+                header.appendChild(nameEl);
+                header.appendChild(roleEl);
+            }
+
+            const thread = document.getElementById('message-thread');
+            if (!thread) return;
+            thread.innerHTML = '';
+            const messages = SEED.messages[convId] || [];
+            messages.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex ${msg.mine ? 'justify-end' : 'justify-start'}`;
+                const bubble = document.createElement('div');
+                bubble.className = `max-w-xs px-3 py-2 rounded-2xl text-sm ${msg.mine ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-800'}`;
+                bubble.textContent = msg.text;
+                const timeEl = document.createElement('div');
+                timeEl.className = 'text-xs text-slate-400 mt-1 ' + (msg.mine ? 'text-right' : '');
+                timeEl.textContent = msg.time;
+                msgDiv.appendChild(bubble);
+                const wrapper = document.createElement('div');
+                wrapper.appendChild(msgDiv);
+                wrapper.appendChild(timeEl);
+                thread.appendChild(wrapper);
+            });
+            thread.scrollTop = thread.scrollHeight;
+            conv.unread = 0;
+            renderMessaging();
+        }
+
+        function handleMsgKeydown(e) { if (e.key === 'Enter') sendMessage(); }
+
+        function sendMessage() {
+            const input = document.getElementById('msg-input');
+            if (!input || !input.value.trim() || !AppState.activeConversation) return;
+            const text = input.value.trim();
+            input.value = '';
+            if (!SEED.messages[AppState.activeConversation]) SEED.messages[AppState.activeConversation] = [];
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+            SEED.messages[AppState.activeConversation].push({ from:'Me', text, time:timeStr, mine:true });
+            const conv = SEED.conversations.find(c=>c.id===AppState.activeConversation);
+            if (conv) conv.lastMsg = text;
+            openConversation(AppState.activeConversation);
+            showToast('Message sent', 'success');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // MODULE 12 RENDERER: ANNOUNCEMENTS
+        // ════════════════════════════════════════════════════════
+
+        function renderAnnouncements() {
+            const feed = document.getElementById('announcements-feed');
+            if (!feed) return;
+            feed.innerHTML = '';
+            const announcements = storeGet('announcements', SEED.announcements);
+            const audienceColors = { 'All Families':'bg-brand-100 text-brand-700', 'Basketball Families':'bg-orange-100 text-orange-700', 'Swim League Families':'bg-blue-100 text-blue-700' };
+
+            announcements.forEach(ann => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-slate-100 shadow-sm p-5';
+                const audienceBadge = `<span class="text-xs px-2 py-0.5 rounded-full font-medium ${audienceColors[ann.audience]||'bg-slate-100 text-slate-600'}">${ann.audience}</span>`;
+                const statusBadge = ann.status === 'scheduled'
+                    ? '<span class="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-medium">Scheduled</span>'
+                    : '<span class="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Published</span>';
+                const pinIcon = ann.pinned ? '<i class="fas fa-thumbtack text-brand-500 mr-2" aria-label="Pinned" title="Pinned"></i>' : '';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-center flex-wrap gap-2">${audienceBadge} ${statusBadge}</div>
+                        <span class="text-xs text-slate-400 flex-shrink-0 ml-2">${ann.date}</span>
+                    </div>
+                    <h4 class="font-semibold text-slate-900 mb-1">${pinIcon}${ann.title}</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">${ann.body}</p>
+                    <div class="flex gap-2 mt-3 pt-3 border-t border-slate-100">
+                        <button onclick="showToast('Editing announcement...','info')" class="text-xs text-brand-600 hover:underline" aria-label="Edit announcement">Edit</button>
+                        <button onclick="showToast('Announcement deleted','success')" class="text-xs text-red-500 hover:underline" aria-label="Delete announcement">Delete</button>
+                    </div>
+                `;
+                feed.appendChild(card);
+            });
+        }
+
+        // ════════════════════════════════════════════════════════
+        // MODULE 13 RENDERER: SAFETY
+        // ════════════════════════════════════════════════════════
+
+        function renderSafety() {
+            // Certifications
+            const certList = document.getElementById('certifications-list');
+            if (certList) {
+                certList.innerHTML = '';
+                const certStatusColors = { valid:'text-green-600', expiring:'text-amber-600', expired:'text-red-600' };
+                const certStatusIcons = { valid:'fa-check-circle', expiring:'fa-exclamation-circle', expired:'fa-times-circle' };
+                SEED.certifications.forEach(c => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center gap-3 p-3 hover:bg-slate-50 transition';
+                    item.innerHTML = `
+                        <i class="fas ${certStatusIcons[c.status]||'fa-circle'} ${certStatusColors[c.status]||'text-slate-400'}" aria-hidden="true"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-medium text-slate-900">${c.staff}</div>
+                            <div class="text-xs text-slate-500">${c.cert}</div>
+                        </div>
+                        <div class="text-xs text-right flex-shrink-0">
+                            <div class="text-slate-500">Expires</div>
+                            <div class="${certStatusColors[c.status]||'text-slate-600'} font-medium">${c.expiry}</div>
+                        </div>
+                    `;
+                    certList.appendChild(item);
+                });
+            }
+
+            // Incidents
+            const incidentList = document.getElementById('incidents-list');
+            if (incidentList) {
+                incidentList.innerHTML = '';
+                const sevColors = { low:'text-amber-500', medium:'text-orange-500', high:'text-red-600' };
+                SEED.incidents.forEach(inc => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-start gap-3 p-3 hover:bg-slate-50 transition';
+                    const statusBadge = inc.status === 'Resolved'
+                        ? '<span class="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">Resolved</span>'
+                        : '<span class="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded-full">Open</span>';
+                    item.innerHTML = `
+                        <i class="fas fa-shield-alt ${sevColors[inc.severity]||'text-slate-400'} mt-0.5 flex-shrink-0" aria-hidden="true"></i>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-medium text-slate-900">${inc.athlete} — ${inc.type}</div>
+                            <div class="text-xs text-slate-500">${inc.description}</div>
+                            <div class="text-xs text-slate-400 mt-1">${inc.date}</div>
+                        </div>
+                        <div class="flex-shrink-0">${statusBadge}</div>
+                    `;
+                    incidentList.appendChild(item);
+                });
+            }
+
+            // Waivers
+            const waiverList = document.getElementById('waiver-list');
+            if (waiverList) {
+                waiverList.innerHTML = '';
+                SEED.waivers.forEach(w => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center gap-3 p-3 hover:bg-slate-50 transition';
+                    item.innerHTML = `
+                        <i class="fas ${w.signed?'fa-check-circle text-green-500':'fa-times-circle text-red-400'}" aria-hidden="true"></i>
+                        <div class="flex-1">
+                            <span class="text-sm font-medium text-slate-900">${w.athlete}</span>
+                            <span class="text-sm text-slate-500 ml-2">— ${w.waiver}</span>
+                        </div>
+                        <div class="text-xs text-slate-400">${w.signed ? w.date : '<span class="text-red-500 font-medium">Unsigned</span>'}</div>
+                        ${!w.signed ? '<button onclick="showToast(\'Reminder sent!\',\'success\')" class="text-xs text-brand-600 hover:underline ml-2">Remind</button>' : ''}
+                    `;
+                    waiverList.appendChild(item);
+                });
+            }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // MODULE 14 RENDERER: REPORTS
+        // ════════════════════════════════════════════════════════
+
+        let reportsChartsInit = false;
+        function renderReports() {
+            // Program performance table
+            const tbody = document.getElementById('reports-programs-tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                const programs = [
+                    { name:'Elite Basketball Camp', enrolled:24, capacity:30, revenue:10800, retention:96 },
+                    { name:'Youth Soccer Academy', enrolled:18, capacity:25, revenue:5760, retention:91 },
+                    { name:'Summer Swim League', enrolled:32, capacity:40, revenue:8960, retention:94 },
+                    { name:'Tennis Fundamentals', enrolled:12, capacity:16, revenue:2520, retention:88 },
+                ];
+                programs.forEach(p => {
+                    const healthPct = Math.round((p.enrolled/p.capacity)*100);
+                    const healthColor = healthPct>=90?'text-green-600':healthPct>=70?'text-amber-600':'text-red-600';
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition';
+                    tr.innerHTML = `
+                        <td class="px-4 py-3 font-medium text-slate-900">${p.name}</td>
+                        <td class="px-4 py-3 text-slate-700">${p.enrolled}</td>
+                        <td class="px-4 py-3 text-slate-500">${p.capacity}</td>
+                        <td class="px-4 py-3 font-semibold text-slate-900">$${p.revenue.toLocaleString()}</td>
+                        <td class="px-4 py-3 text-slate-700">${p.retention}%</td>
+                        <td class="px-4 py-3 font-bold ${healthColor}">${healthPct}%</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // ITEM 83: Lazy-initialize charts only once
+            if (reportsChartsInit) return;
+            reportsChartsInit = true;
+
+            // ITEM 51: Registration Trends Chart
+            const regCtx = document.getElementById('reports-registration-chart');
+            if (regCtx && typeof Chart !== 'undefined') {
+                new Chart(regCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Sep','Oct','Nov','Dec','Jan','Feb'],
+                        datasets: [{
+                            label: 'Registrations',
+                            data: [45, 52, 38, 61, 73, 86],
+                            borderColor: '#0284c7',
+                            backgroundColor: 'rgba(2,132,199,0.1)',
+                            tension: 0.4,
+                            fill: true,
+                        }]
+                    },
+                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                });
+            }
+
+            // Revenue by Program Chart
+            const revCtx = document.getElementById('reports-revenue-chart');
+            if (revCtx && typeof Chart !== 'undefined') {
+                new Chart(revCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Basketball','Soccer','Swim','Tennis'],
+                        datasets: [{
+                            data: [10800, 5760, 8960, 2520],
+                            backgroundColor: ['#0284c7','#16a34a','#9333ea','#d97706'],
+                        }]
+                    },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                });
+            }
         }
 
         // ITEM 5: All DOM lookups now null-safe with optional chaining / guard clauses
