@@ -633,13 +633,22 @@
                         </button>
                     </div>
 
+                    <!-- ITEM 50: Performance Chart -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-slate-900">Weekly Performance</h3>
+                            <span class="text-xs text-slate-400">Check-ins & Revenue</span>
+                        </div>
+                        <canvas id="performance-chart" height="120" aria-label="Weekly performance chart showing check-ins and revenue" role="img"></canvas>
+                    </div>
+
                     <!-- Recent Activity -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold text-slate-900">Recent Activity</h3>
-                            <button class="text-sm text-brand-600 font-semibold hover:text-brand-800">View All</button>
+                            <button class="text-sm text-brand-600 font-semibold hover:text-brand-800" onclick="ActivityFeed.render()">Refresh</button>
                         </div>
-                        <div class="space-y-4" id="activity-feed">
+                        <div class="space-y-1" id="activity-feed" aria-label="Recent activity feed" aria-live="polite">
                             <div class="flex items-start gap-3 pb-4 border-b border-slate-100 hover:bg-slate-50 p-2 rounded-lg transition cursor-pointer">
                                 <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0">
                                     <i class="fas fa-dollar-sign text-xs"></i>
@@ -3575,6 +3584,495 @@
             const cap = capacities[programName] || 30;
             return { enrolled, capacity: cap, isFull: enrolled >= cap, available: cap - enrolled };
         }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 50: Real Dashboard Chart (Performance over time)
+        // ════════════════════════════════════════════════════════
+        let dashboardChartInit = false;
+        function initDashboardChart() {
+            if (dashboardChartInit) return;
+            const ctx = document.getElementById('performance-chart');
+            if (!ctx || typeof Chart === 'undefined') return;
+            dashboardChartInit = true;
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+                    datasets: [
+                        {
+                            label: 'Check-ins',
+                            data: [42, 58, 35, 67, 71, 89, 45],
+                            borderColor: '#0284c7',
+                            backgroundColor: 'rgba(2,132,199,0.08)',
+                            tension: 0.4, fill: true, pointRadius: 4,
+                        },
+                        {
+                            label: 'Revenue ($)',
+                            data: [820, 1240, 680, 1580, 1890, 2100, 940],
+                            borderColor: '#16a34a',
+                            backgroundColor: 'rgba(22,163,74,0.05)',
+                            tension: 0.4, fill: true, pointRadius: 4,
+                            yAxisID: 'y1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Check-ins' } },
+                        y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Revenue ($)' }, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 48: Empty State Components
+        // ════════════════════════════════════════════════════════
+
+        /**
+         * Render an empty state into a container element.
+         * @param {HTMLElement} container
+         * @param {string} icon - Font Awesome icon class (e.g. 'fa-users')
+         * @param {string} title
+         * @param {string} subtitle
+         * @param {string} [actionLabel] - Optional CTA button label
+         * @param {Function} [actionFn] - Optional CTA callback
+         */
+        function renderEmptyState(container, icon, title, subtitle, actionLabel, actionFn) {
+            container.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.className = 'text-center py-16 px-4';
+            const iconEl = document.createElement('div');
+            iconEl.className = 'w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4';
+            const i = document.createElement('i');
+            i.className = `fas ${icon} text-2xl text-slate-400`;
+            i.setAttribute('aria-hidden', 'true');
+            iconEl.appendChild(i);
+            const titleEl = document.createElement('p');
+            titleEl.className = 'text-lg font-semibold text-slate-700 mb-1';
+            titleEl.textContent = title;
+            const subEl = document.createElement('p');
+            subEl.className = 'text-sm text-slate-400';
+            subEl.textContent = subtitle;
+            wrapper.appendChild(iconEl);
+            wrapper.appendChild(titleEl);
+            wrapper.appendChild(subEl);
+            if (actionLabel && actionFn) {
+                const btn = document.createElement('button');
+                btn.className = 'mt-4 px-4 py-2 bg-brand-600 text-white text-sm rounded-xl hover:bg-brand-700 transition';
+                btn.textContent = actionLabel;
+                btn.onclick = actionFn;
+                wrapper.appendChild(btn);
+            }
+            container.appendChild(wrapper);
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 49: Skeleton Loading Helper
+        // ════════════════════════════════════════════════════════
+        function showSkeleton(containerId, rows = 3) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            el.innerHTML = Array.from({length: rows}, () => `
+                <div class="flex gap-3 p-4">
+                    <div class="skeleton w-10 h-10 rounded-full flex-shrink-0"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="skeleton h-3 w-3/4 rounded"></div>
+                        <div class="skeleton h-3 w-1/2 rounded"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 52: Tooltip Component
+        // ════════════════════════════════════════════════════════
+        function addTooltips() {
+            document.querySelectorAll('[data-tooltip]').forEach(el => {
+                el.setAttribute('title', el.dataset.tooltip);
+                el.setAttribute('aria-label', el.dataset.tooltip);
+            });
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 53: Table Column Sorting
+        // ════════════════════════════════════════════════════════
+        let sortState = { col: null, dir: 'asc' };
+
+        function makeSortable(tableId, data, renderFn) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            const headers = table.querySelectorAll('th[data-sort]');
+            headers.forEach(th => {
+                th.onclick = () => {
+                    const col = th.dataset.sort;
+                    if (sortState.col === col) {
+                        sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        sortState.col = col;
+                        sortState.dir = 'asc';
+                    }
+                    headers.forEach(h => { h.classList.remove('asc','desc'); });
+                    th.classList.add(sortState.dir);
+                    const sorted = [...data].sort((a, b) => {
+                        const av = a[col], bv = b[col];
+                        const cmp = typeof av === 'number' ? av - bv : String(av).localeCompare(String(bv));
+                        return sortState.dir === 'asc' ? cmp : -cmp;
+                    });
+                    renderFn(sorted);
+                };
+            });
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 54: Pagination Component
+        // ════════════════════════════════════════════════════════
+        const PER_PAGE = 10;
+
+        function paginateData(data, page) {
+            const start = (page - 1) * PER_PAGE;
+            return data.slice(start, start + PER_PAGE);
+        }
+
+        function renderPagination(containerId, totalItems, currentPage, onPageChange) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const totalPages = Math.ceil(totalItems / PER_PAGE);
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+            container.innerHTML = '';
+            const nav = document.createElement('div');
+            nav.className = 'flex items-center justify-between p-3 border-t border-slate-100';
+            nav.setAttribute('role', 'navigation');
+            nav.setAttribute('aria-label', 'Pagination');
+
+            const info = document.createElement('span');
+            info.className = 'text-xs text-slate-500';
+            const start = (currentPage-1)*PER_PAGE+1;
+            const end = Math.min(currentPage*PER_PAGE, totalItems);
+            info.textContent = `Showing ${start}–${end} of ${totalItems}`;
+
+            const btns = document.createElement('div');
+            btns.className = 'flex gap-1';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                btn.className = `w-7 h-7 text-xs rounded-lg transition ${i===currentPage?'bg-brand-600 text-white':'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+                btn.setAttribute('aria-label', `Page ${i}`);
+                if (i === currentPage) btn.setAttribute('aria-current', 'page');
+                btn.onclick = () => onPageChange(i);
+                btns.appendChild(btn);
+            }
+
+            nav.appendChild(info);
+            nav.appendChild(btns);
+            container.appendChild(nav);
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 55: Filter Chips Component
+        // ════════════════════════════════════════════════════════
+        function renderFilterChips(containerId, options, activeFilters, onToggle) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            options.forEach(opt => {
+                const chip = document.createElement('button');
+                const isActive = activeFilters.includes(opt);
+                chip.className = `px-3 py-1 rounded-full text-xs font-medium transition border ${isActive ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-slate-300 hover:border-brand-400'}`;
+                chip.textContent = opt;
+                chip.setAttribute('aria-pressed', String(isActive));
+                chip.onclick = () => onToggle(opt);
+                container.appendChild(chip);
+            });
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 67: Activity Feed — real actions populate feed
+        // ════════════════════════════════════════════════════════
+        const ActivityFeed = {
+            items: storeGet('activityFeed', [
+                { icon: 'fa-user-plus', color: 'text-green-600 bg-green-100', text: 'Marcus Johnson enrolled in Elite Basketball Camp', time: '2 min ago' },
+                { icon: 'fa-dollar-sign', color: 'text-blue-600 bg-blue-100', text: 'Payment of $450 received from Sharon Johnson', time: '15 min ago' },
+                { icon: 'fa-calendar-check', color: 'text-purple-600 bg-purple-100', text: 'Basketball Practice checked in — 22/24 players', time: '1 hr ago' },
+                { icon: 'fa-bell', color: 'text-amber-600 bg-amber-100', text: 'Low stock alert: Basketball Jerseys (L) at 3 units', time: '2 hrs ago' },
+                { icon: 'fa-bullhorn', color: 'text-brand-600 bg-brand-100', text: 'Announcement sent to All Families — Spring Registration Open', time: '3 hrs ago' },
+                { icon: 'fa-shield-alt', color: 'text-red-600 bg-red-100', text: 'Safety incident logged: Noah Anderson — Minor Injury', time: '5 hrs ago' },
+            ]),
+
+            add(icon, color, text) {
+                this.items.unshift({ icon, color, text, time: 'Just now' });
+                if (this.items.length > 20) this.items.pop();
+                storeSet('activityFeed', this.items);
+                this.render();
+            },
+
+            render() {
+                const el = document.getElementById('activity-feed');
+                if (!el) return;
+                el.innerHTML = '';
+                this.items.slice(0, 6).forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition';
+                    const iconDiv = document.createElement('div');
+                    iconDiv.className = `w-8 h-8 ${item.color} rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`;
+                    const i = document.createElement('i');
+                    i.className = `fas ${item.icon} text-xs`;
+                    i.setAttribute('aria-hidden', 'true');
+                    iconDiv.appendChild(i);
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'flex-1 min-w-0';
+                    const p = document.createElement('p');
+                    p.className = 'text-sm text-slate-700 leading-snug';
+                    p.textContent = item.text;
+                    const t = document.createElement('span');
+                    t.className = 'text-xs text-slate-400';
+                    t.textContent = item.time;
+                    textDiv.appendChild(p);
+                    textDiv.appendChild(t);
+                    div.appendChild(iconDiv);
+                    div.appendChild(textDiv);
+                    el.appendChild(div);
+                });
+            }
+        };
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 72: Mobile Swipe Navigation
+        // ════════════════════════════════════════════════════════
+        (function initSwipeNav() {
+            let touchStartX = 0, touchStartY = 0;
+            const modules = ['dashboard','registration','rosters','schedule','facilities','commerce','inventory','messaging','announcements','safety','reports'];
+
+            document.addEventListener('touchstart', e => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            document.addEventListener('touchend', e => {
+                const dx = e.changedTouches[0].clientX - touchStartX;
+                const dy = e.changedTouches[0].clientY - touchStartY;
+                // Only trigger if horizontal swipe is dominant and large enough
+                if (Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 2) {
+                    const currentIdx = modules.indexOf(AppState.currentModule);
+                    if (dx < 0 && currentIdx < modules.length - 1) {
+                        switchModule(modules[currentIdx + 1]);
+                    } else if (dx > 0 && currentIdx > 0) {
+                        switchModule(modules[currentIdx - 1]);
+                    }
+                }
+            }, { passive: true });
+        })();
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 80: Cache frequently used DOM elements
+        // ════════════════════════════════════════════════════════
+        const DOM = {};
+        function cacheDOMElements() {
+            DOM.sidebar = document.querySelector('.desktop-sidebar');
+            DOM.toastContainer = document.getElementById('toast-container');
+            DOM.pageTitle = document.getElementById('page-title');
+            DOM.globalSearch = document.getElementById('global-search');
+            DOM.mobileMenu = document.getElementById('mobile-more-menu');
+            DOM.notifPanel = document.getElementById('notifications-panel');
+            DOM.quickActions = document.getElementById('quick-actions-modal');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 88: Program Health Score Algorithm
+        // ════════════════════════════════════════════════════════
+        function calculateHealthScore(programName) {
+            const cap = checkProgramCapacity(programName);
+            const payments = storeGet('payments', SEED.payments);
+            const programPayments = payments.filter(p => p.program === programName);
+            const paidCount = programPayments.filter(p => p.status === 'Paid').length;
+            const paymentRate = programPayments.length > 0 ? paidCount / programPayments.length : 1;
+            const fillRate = cap.enrolled / cap.capacity;
+            const score = Math.round((fillRate * 0.6 + paymentRate * 0.4) * 100);
+            return Math.min(100, Math.max(0, score));
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 89: Check-in QR Code Generator
+        // ════════════════════════════════════════════════════════
+        function generateCheckInQR(eventId) {
+            const events = storeGet('events', SEED.events);
+            const event = events.find(e => String(e.id) === String(eventId));
+            if (!event) return;
+
+            openModal(`QR Check-in: ${event.title}`, `
+                <div class="text-center space-y-4">
+                    <p class="text-sm text-slate-500">Scan to check in for <strong>${event.title}</strong></p>
+                    <div id="qr-container" class="flex items-center justify-center p-4 bg-white border-2 border-slate-100 rounded-xl mx-auto" style="width:200px;height:200px;"></div>
+                    <p class="text-xs text-slate-400">Event ID: ${event.id} · ${event.date} at ${event.time}</p>
+                    <button onclick="closeModal()" class="w-full px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700 transition">Done</button>
+                </div>
+            `);
+
+            setTimeout(() => {
+                const qrDiv = document.getElementById('qr-container');
+                if (qrDiv && typeof QRCode !== 'undefined') {
+                    new QRCode(qrDiv, {
+                        text: `athleteos://checkin/${event.id}`,
+                        width: 160, height: 160,
+                        colorDark: '#0284c7', colorLight: '#ffffff',
+                    });
+                } else if (qrDiv) {
+                    qrDiv.innerHTML = '<p class="text-xs text-slate-400 p-4">QR library loading...</p>';
+                }
+            }, 100);
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 92: Facility Maintenance Mode Toggle
+        // ════════════════════════════════════════════════════════
+        function toggleFacilityMaintenance(facilityId) {
+            const facility = SEED.facilities.find(f => String(f.id) === String(facilityId));
+            if (!facility) return;
+            const wasInMaintenance = facility.status === 'Maintenance';
+            facility.status = wasInMaintenance ? 'Available' : 'Maintenance';
+            showToast(`${facility.name} is now ${facility.status}`, wasInMaintenance ? 'success' : 'warning');
+            if (AppState.currentModule === 'facilities') renderFacilities();
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 93: Message Read Receipts
+        // ════════════════════════════════════════════════════════
+        function getReadReceipt(convId) {
+            const readAt = storeGet('readReceipts', {});
+            return readAt[convId] ? new Date(readAt[convId]).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) : null;
+        }
+
+        function markConversationRead(convId) {
+            const readAt = storeGet('readReceipts', {});
+            readAt[convId] = new Date().toISOString();
+            storeSet('readReceipts', readAt);
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 94: Announcement Scheduling
+        // ════════════════════════════════════════════════════════
+        function processScheduledAnnouncements() {
+            const announcements = storeGet('announcements', SEED.announcements);
+            const today = new Date().toISOString().split('T')[0];
+            let changed = false;
+            announcements.forEach(a => {
+                if (a.status === 'scheduled' && a.date <= today) {
+                    a.status = 'published';
+                    changed = true;
+                }
+            });
+            if (changed) {
+                storeSet('announcements', announcements);
+                showToast('Scheduled announcements have been published!', 'success');
+            }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 97: First-time User Onboarding Tour
+        // ════════════════════════════════════════════════════════
+        function startOnboardingTour() {
+            const steps = [
+                { title: 'Welcome to AthleteOS!', body: 'This quick tour will show you the key features. You can press Escape at any time to exit.' },
+                { title: 'Navigation', body: 'Use the sidebar to navigate between modules like Rosters, Schedule, Facilities, and more.' },
+                { title: 'Quick Actions', body: 'Click the ⚡ button in the header to quickly add players, create events, or record payments.' },
+                { title: 'Search', body: 'Press "/" to focus the search bar. Search for athletes, programs, or events instantly.' },
+                { title: 'Keyboard Shortcuts', body: 'Press "Shift + ?" to see all keyboard shortcuts. Press D for Dashboard, R for Rosters, S for Schedule.' },
+                { title: "You're all set!", body: 'Explore the platform! Your data is saved automatically. Click any module in the sidebar to get started.' },
+            ];
+
+            let stepIdx = 0;
+            const showStep = () => {
+                if (stepIdx >= steps.length) { closeModal(); storeSet('onboardingDone', true); return; }
+                const s = steps[stepIdx];
+                openModal(s.title, `
+                    <div class="space-y-4">
+                        <p class="text-slate-600 text-sm">${s.body}</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex gap-1">${steps.map((_,i)=>`<div class="w-2 h-2 rounded-full ${i===stepIdx?'bg-brand-600':'bg-slate-200'}"></div>`).join('')}</div>
+                            <div class="flex gap-2">
+                                ${stepIdx > 0 ? `<button onclick="tourBack()" class="px-4 py-2 border border-slate-300 rounded-xl text-sm hover:bg-slate-50">Back</button>` : ''}
+                                <button onclick="tourNext()" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-sm hover:bg-brand-700">
+                                    ${stepIdx < steps.length-1 ? 'Next →' : '🚀 Get Started'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            };
+            window.tourNext = () => { stepIdx++; showStep(); };
+            window.tourBack = () => { stepIdx--; showStep(); };
+            showStep();
+        }
+
+        // Auto-start onboarding for first-time users
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (!storeGet('onboardingDone', false)) startOnboardingTour();
+            }, 1500);
+
+            // ITEM 50: Init dashboard chart
+            setTimeout(initDashboardChart, 500);
+
+            // ITEM 80: Cache DOM elements
+            cacheDOMElements();
+
+            // ITEM 94: Process scheduled announcements
+            processScheduledAnnouncements();
+
+            // ITEM 67: Render activity feed
+            ActivityFeed.render();
+
+            // ITEM 52: Add tooltips
+            addTooltips();
+        });
+
+        // ════════════════════════════════════════════════════════
+        // ITEM 95: JSDoc - key functions already documented above.
+        // Additional documentation:
+        // ════════════════════════════════════════════════════════
+
+        /**
+         * @typedef {Object} Athlete
+         * @property {number} id - Unique athlete ID
+         * @property {string} name - Full name
+         * @property {number} age - Current age
+         * @property {string} program - Enrolled program name
+         * @property {'Active'|'Waitlisted'|'Inactive'} status - Enrollment status
+         * @property {string} guardian - Guardian name
+         * @property {string} email - Contact email
+         * @property {string} phone - Contact phone
+         * @property {string} dob - Date of birth (YYYY-MM-DD)
+         * @property {boolean} paid - Whether fees are paid
+         */
+
+        /**
+         * @typedef {Object} Event
+         * @property {number} id
+         * @property {string} title
+         * @property {string} date - YYYY-MM-DD
+         * @property {string} time - Human-readable time
+         * @property {string} facility
+         * @property {string} program
+         * @property {'practice'|'game'|'competition'|'clinic'|'meeting'} type
+         * @property {string} coach
+         */
+
+        /**
+         * @typedef {Object} Payment
+         * @property {number} id
+         * @property {string} athlete
+         * @property {string} program
+         * @property {number} amount
+         * @property {string} date
+         * @property {string} method
+         * @property {'Paid'|'Pending'|'Overdue'} status
+         */
+
     </script>
 </body>
 </html>
